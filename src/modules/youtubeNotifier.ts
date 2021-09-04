@@ -5,8 +5,9 @@ import { emoji } from '../helpers/discord'
 import { notifyDiscord, NotifyOptions } from './notify'
 import { frameEmitter } from './holodex/frameEmitter'
 import { DexFrame } from './holodex/frames'
+import { isMainThread } from 'worker_threads'
 
-frameEmitter.on ('frame', notifyFrame)
+if (isMainThread) frameEmitter.on ('frame', notifyFrame)
 
 async function notifyFrame (frame: DexFrame): Promise<void> {
   const streamer   = streamers.find (s => s.ytId === frame.channel.id)

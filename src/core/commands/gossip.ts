@@ -24,7 +24,7 @@ export const gossip: Command = {
       msg, verb, streamer, usage,
       feature: 'gossip',
       add: {
-        success: `${emoji.peek} Relaying gossip other chats`,
+        success: `${emoji.peek} Relaying gossip in other chats`,
         failure: oneLine`
           :warning: Gossip about ${streamer} in other chats already being
           relayed in this channel.

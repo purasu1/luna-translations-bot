@@ -6,9 +6,10 @@ import { getTwitterUsername, Streamer, streamers } from '../core/db/streamers'
 import { emoji } from '../helpers/discord'
 import { tryOrLog } from '../helpers/tryCatch'
 import { notifyDiscord } from './notify'
+import { isMainThread } from 'worker_threads'
 const { twitcastingId, twitcastingSecret } = config
 
-initTwitcast ()
+if (isMainThread) initTwitcast ()
 
 function initTwitcast (): void {
   const socket = new WebSocket (

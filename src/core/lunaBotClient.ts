@@ -1,10 +1,15 @@
 import { Client, Intents } from 'discord.js'
-import { loadAllCommands, loadAllEvents } from '../helpers/discord'
+import { Command, loadAllCommands, loadAllEvents } from '../helpers/discord'
+import { isMainThread } from 'worker_threads'
+import {Map} from 'immutable'
 
-export const commands = loadAllCommands ()
+export const commands: Map<string, Command> =
+  isMainThread ? loadAllCommands () : Map ()
 
 export const client = new Client ({ intents: new Intents ([
   'GUILDS', 'GUILD_MESSAGES', 'DIRECT_MESSAGES'
 ])})
 
-loadAllEvents ().forEach ((callback, evtName) => client.on (evtName, callback))
+if (isMainThread) {
+  loadAllEvents ().forEach ((callback, evtName) => client.on (evtName, callback))
+}
