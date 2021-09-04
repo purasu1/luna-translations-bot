@@ -1,0 +1,6 @@
+/build
+.env.example
+.env
+README.md
+/node_modules
+/data

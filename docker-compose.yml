@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  bot:
+    build: .
+    environment:
+      DISCORD_PROD_TOKEN: ${DISCORD_PROD_TOKEN}
+      DEEPL_KEY: ${DEEPL_KEY}
+      MONGODB_URL: mongodb://db/luna
+    volumes:
+      - ./data/logs:/app/logs
+    depends_on:
+      - db
+
+  db:
+    image: mongo:5
+    volumes:
+      - ./data/mongo:/data/db

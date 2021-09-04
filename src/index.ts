@@ -8,7 +8,9 @@ import { config } from './config'
 import { client } from './core/'
 import mongoose from 'mongoose'
 
-mongoose.connect ('mongodb://localhost/luna', {
+const MONGODB_URL = process.env.MONGODB_URL ?? 'mongodb://localhost/luna'
+
+mongoose.connect (MONGODB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
