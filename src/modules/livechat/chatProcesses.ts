@@ -21,5 +21,5 @@ type ChatProcess = ChildProcessWithoutNullStreams
 const chatProcesses: Record<VideoId, ChatProcess> = {}
 
 function spawnChatProcess (liveId: VideoId): ChatProcess {
-  return spawn ('python3', ['-u', './modules/livechat/chat_dl.py', liveId])
+  return spawn ('python3', ['-u', './chat_dl.py', liveId])
 }
