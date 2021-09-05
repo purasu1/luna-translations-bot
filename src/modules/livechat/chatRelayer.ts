@@ -4,7 +4,7 @@ import { DexFrame, isPublic, VideoId } from '../holodex/frames'
 import { getChatProcess } from './chatProcesses'
 import { findTextChannel, send } from '../../helpers/discord'
 import { Snowflake, TextChannel, ThreadChannel } from 'discord.js'
-import { addToGuildRelayHistory, getGuildData, getAllSettings } from '../../core/db/functions'
+import { addToGuildRelayHistory, getGuildData, getAllSettings, addToBotRelayHistory } from '../../core/db/functions'
 import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db/models'
 import { retryIfStillUpThenPostLog } from './closeHandler'
 import { logCommentData } from './logging'
@@ -106,7 +106,7 @@ function saveComment (
   chId?: Snowflake,
   gid?: Snowflake,
 ): void {
-  const addFn = type === 'guild' ? addToGuildRelayHistory : doNothing
+  const addFn = type === 'guild' ? addToGuildRelayHistory : addToBotRelayHistory
   const startTime  = new Date (Date.parse (frame.start_actual ?? '')).valueOf ()
   const loggedTime = new Date (+cmt.time).valueOf ()
   const timestamp  = !frame.start_actual
