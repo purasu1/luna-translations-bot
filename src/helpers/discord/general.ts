@@ -82,9 +82,9 @@ export function validateRole (
 export function canBot (
   perm: PermissionResolvable, channel?: TextBasedChannels
 ): boolean {
-  const unsupported = [NewsChannel, DMChannel]
+  const unsupported = [DMChannel]
   const isSupported = unsupported.every (type => !(channel instanceof type))
-  const validated = <TextChannel | ThreadChannel | undefined> channel
+  const validated = <TextChannel | ThreadChannel | NewsChannel | undefined> channel
   return isSupported
       && !!validated?.guild.me
       && validated.permissionsFor (validated.guild.me!).has (perm)

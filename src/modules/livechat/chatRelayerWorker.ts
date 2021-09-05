@@ -1,7 +1,7 @@
 import { ciEquals, doNothing, match } from '../../helpers'
 import { DexFrame } from '../holodex/frames'
 import { Streamer, StreamerName, streamers } from '../../core/db/streamers'
-import { emoji, findTextChannel } from '../../helpers/discord'
+import { emoji } from '../../helpers/discord'
 import { Snowflake } from 'discord.js'
 import { tl } from '../deepl'
 import { isBlacklistedOrUnwanted, isHoloID, isStreamer, isTl } from './commentBooleans'
@@ -9,14 +9,14 @@ import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db
 import { ChatComment } from './chatRelayer'
 
 export default (input: ChatWorkerInput): Promise<Task[]> => {
-  guilds = input.guilds
+  allEntries = input.allEntries
   return processComments (input.frame, input.cmts)
 }
 
 interface ChatWorkerInput {
   frame: DexFrame
   cmts: ChatComment[]
-  guilds: GuildSettings[]
+  allEntries: [GuildSettings, WatchFeature, WatchFeatureSettings][]
 }
 
 interface LogCommentTask {
@@ -49,32 +49,29 @@ export type Task = SendMessageTask | SaveMessageTask | LogCommentTask
 
 ///////////////////////////////////////////////////////////////////////////////
 
-let guilds: GuildSettings[] = []
+let allEntries: [GuildSettings, WatchFeature, WatchFeatureSettings][] = []
 
 async function processComments (
   frame: DexFrame, cmts: ChatComment[]
 ): Promise<Task[]> {
   const tasks = await Promise.all (cmts.flatMap (async cmt => {
-    const features: WatchFeature[] = ['relay', 'cameos', 'gossip']
     const streamer    = streamers.find (s => s.ytId === frame.channel.id)
     const author      = streamers.find (s => s.ytId === cmt.id)
     const isCameo     = isStreamer (cmt.id) && !cmt.isOwner
     const mustDeepL   = isStreamer (cmt.id) && !isHoloID (streamer)
     const deepLTl     = mustDeepL ? await tl (cmt.body) : undefined
     const mustShowTl  = mustDeepL && deepLTl !== cmt.body
-    const getWatched  = (f: WatchFeature) => f === 'cameos' ? author : streamer
     const maybeGossip = isStreamer (cmt.id) || isTl (cmt.body)
-    const entries =
-      guilds.flatMap (g =>
-        features.flatMap (f =>
-          getRelayEntries (g, f, getWatched (f)?.name).map (e =>
-            [g, f, e] as [GuildSettings, WatchFeature, WatchFeatureSettings])))
+    const entries     = allEntries.filter (([{}, f, e]) =>
+      [(f === 'cameos' ? author : streamer)?.name, 'all'].includes (e.streamer)
+    )
 
     const logTask: LogCommentTask = {
       _tag: 'LogCommentTask', cmt, frame, streamer
     }
 
     const mustSave = isTl (cmt.body) || isStreamer (cmt.id)
+
     const saveTask: SaveMessageTask = {
       _tag: 'SaveMessageTask',
       comment: cmt,
@@ -99,6 +96,7 @@ async function processComments (
 
     return [logTask, ...sendTasks, ...(mustSave ? [saveTask] : [])]
   }))
+
   return tasks.flat ()
 }
 
@@ -116,7 +114,11 @@ function relayCameo (
     content: line1 + line2 + line3,
     tlRelay: false,
     vId: frame.id,
-    g: g
+    g: g,
+    save: {
+      comment: cmt,
+      frame
+    }
   }
 }
 
@@ -163,13 +165,6 @@ function relayTlOrStreamerComment (
       }
     }
     : undefined
-}
-
-function getRelayEntries (
-  g: GuildSettings, f: WatchFeature, streamer?: StreamerName
-): WatchFeatureSettings[] {
-  return f === 'gossip' ? g[f] : g[f]
-    .filter (entry => entry.streamer === streamer || entry.streamer === 'all')
 }
 
 function isGossip (text: string, stalked: Streamer, frame: DexFrame): boolean {

@@ -5,7 +5,7 @@ import { getChatProcess } from './chatProcesses'
 import { findTextChannel, send } from '../../helpers/discord'
 import { Snowflake, TextChannel, ThreadChannel } from 'discord.js'
 import { addToGuildRelayHistory, getGuildData, getAllSettings } from '../../core/db/functions'
-import { GuildSettings } from '../../core/db/models'
+import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db/models'
 import { retryIfStillUpThenPostLog } from './closeHandler'
 import { logCommentData } from './logging'
 import { frameEmitter } from '../holodex/frameEmitter'
@@ -31,7 +31,7 @@ export function setupRelay (frame: DexFrame): void {
     const tasks: Task[] = await piscina.run ({
       frame,
       cmts: extractComments(data),
-      guilds,
+      allEntries
     })
     tasks.forEach (runTask)
   })
@@ -51,8 +51,15 @@ export interface ChatComment {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-let guilds: GuildSettings[] = [] // Simple caching
-setInterval (() => guilds = getAllSettings (), 5000)
+const features: WatchFeature[] = ['relay', 'cameos', 'gossip']
+let allEntries: [GuildSettings, WatchFeature, WatchFeatureSettings][] = []
+
+setInterval (() => {
+  const guilds = getAllSettings ()
+  allEntries = guilds.flatMap (g => features.flatMap (f => g[f].map (e =>
+    [g, f, e] as [GuildSettings, WatchFeature, WatchFeatureSettings]
+  )))
+}, 5000)
 
 function runTask (task: Task): void {
   if (task._tag === 'LogCommentTask') {
@@ -73,8 +80,9 @@ function runTask (task: Task): void {
             task.save.comment,
             task.save.frame,
             'guild',
+            msg.id,
+            msg.channelId,
             task.g._id,
-            msg.id
           )
         }
       })
