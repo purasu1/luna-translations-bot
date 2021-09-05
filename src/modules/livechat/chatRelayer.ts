@@ -27,7 +27,6 @@ export function setupRelay (frame: DexFrame): void {
   const chat = getChatProcess (frame.id)
 
   chat.stdout.removeAllListeners ('data')
-  // chat.stdout.on ('data', data => processComments (frame, data))
   chat.stdout.on ('data', async data => {
     const tasks: Task[] = await piscina.run ({
       frame,

@@ -6,6 +6,7 @@ import { Snowflake } from 'discord.js'
 import { tl } from '../deepl'
 import { isBlacklistedOrUnwanted, isHoloID, isStreamer, isTl } from './commentBooleans'
 import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db/models'
+import { ChatComment } from './chatRelayer'
 
 export default (input: ChatWorkerInput): Promise<Task[]> => {
   guilds = input.guilds
@@ -46,18 +47,9 @@ interface SaveMessageTask {
 
 export type Task = SendMessageTask | SaveMessageTask | LogCommentTask
 
-export interface ChatComment {
-  id:      string
-  name:    string
-  body:    string
-  time:    number
-  isMod:   boolean
-  isOwner: boolean
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
-let guilds: GuildSettings[] = [] // Simple caching
+let guilds: GuildSettings[] = []
 
 async function processComments (
   frame: DexFrame, cmts: ChatComment[]
@@ -78,8 +70,6 @@ async function processComments (
           getRelayEntries (g, f, getWatched (f)?.name).map (e =>
             [g, f, e] as [GuildSettings, WatchFeature, WatchFeatureSettings])))
 
-    // logCommentData (cmt, frame, streamer)
-    // if (isTl (cmt.body) || isStreamer (cmt.id)) saveComment (cmt, frame, 'bot')
     const logTask: LogCommentTask = {
       _tag: 'LogCommentTask', cmt, frame, streamer
     }
