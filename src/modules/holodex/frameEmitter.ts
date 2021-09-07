@@ -20,7 +20,8 @@ async function continuouslyEmitNewFrames (
 ): Promise<void> {
   const allFrames = await getFrameList ()
   const newFrames = removeDupeObjects (
-    allFrames?.filter (frame => isNew (frame, previousFrames)) ?? []
+  allFrames?.filter (
+    frame => isNew (frame, previousFrames) && !isFreeChat (frame)) ?? []
   )
 
   newFrames.forEach (frame => {
@@ -39,3 +40,10 @@ function isNew (frame: DexFrame, previousFrames: DexFrame[]): boolean {
   ))
 }
 
+function isFreeChat (frame: DexFrame): boolean {
+  // polka and kson, will improve this later
+  const exceptions = ['UCK9V2B22uJYu3N7eR_BT9QA','UC9ruVYPv7yJmV0Rh0NKA-Lw']
+  const isException = exceptions.some (ch => ch === frame.channel.id)
+  const isFreeChat = ['freechat', 'free chat', 'freeechat', 'フリーチャット'].some (pattern => frame.title.toLowerCase ().includes (pattern))
+  return isFreeChat && !isException
+}

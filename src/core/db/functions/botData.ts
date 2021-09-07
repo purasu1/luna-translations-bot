@@ -1,7 +1,6 @@
 import { DocumentType } from '@typegoose/typegoose'
 import Enmap from 'enmap'
 import { UpdateQuery } from 'mongoose'
-import { debug } from '../../../helpers'
 import { setKey } from '../../../helpers/immutableES6MapFunctions'
 import { VideoId } from '../../../modules/holodex/frames'
 import { BotData, BotDataDb } from '../models'
@@ -30,7 +29,6 @@ export function getNotifiedCommunityPosts (): string[] {
 }
 
 export async function getBotData (): Promise<BotData> {
-  debug ('getting the bot data')
   const query = [{ _id }, {}, { upsert: true, new: true }] as const
   return BotDataDb.findOneAndUpdate (...query)
 }

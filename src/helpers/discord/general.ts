@@ -6,7 +6,7 @@ import { client } from '../../core'
 export function findTextChannel (
   id: Snowflake | undefined
 ): TextChannel | ThreadChannel | undefined {
-  const ch    = client.channels.cache.find (c => c.id === id)
+  const ch    = client.channels.cache.get (id ?? '')
   const valid = [TextChannel, ThreadChannel].some (type => ch instanceof type)
   return valid ? <TextChannel | ThreadChannel> ch : undefined
 }

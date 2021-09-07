@@ -114,11 +114,7 @@ function relayCameo (
     content: line1 + line2 + line3,
     tlRelay: false,
     vId: frame.id,
-    g: g,
-    save: {
-      comment: cmt,
-      frame
-    }
+    g: g
   }
 }
 
