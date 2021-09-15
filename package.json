@@ -34,6 +34,7 @@
     "fp-ts": "^2.10.5",
     "immutable": "*",
     "inquirer": "^7.1.0",
+    "masterchat": "^0.11.0",
     "mongoose": "^5.13.5",
     "node-fetch": "^2.6.1",
     "node-worker-threads-pool": "^1.5.0",
