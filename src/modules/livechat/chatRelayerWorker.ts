@@ -64,6 +64,7 @@ async function processComments (
     const maybeGossip = isStreamer (cmt.id) || isTl (cmt.body)
     const entries     = allEntries.filter (([{}, f, e]) =>
       [(f === 'cameos' ? author : streamer)?.name, 'all'].includes (e.streamer)
+      || f === 'gossip'
     )
 
     const logTask: LogCommentTask = {
