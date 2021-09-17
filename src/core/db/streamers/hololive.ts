@@ -102,7 +102,7 @@ export const hololive = [
     chName: "Nene Ch.桃鈴ねね",
     picture: 'https://yt3.ggpht.com/ytc/AAUvwnilXc5WPsj69fn_xew6see04Cmj3x1vIkW62boi=s800-c-k-c0x00ffffff-no-rj',
     groups: ['5th Generation'], twitter: 'momosuzunene',
-    aliases: ['nene', 'ねね']
+    aliases: ['nene', 'ねね', 'nenechi']
   },
   {
     name: 'Houshou Marine', ytId: 'UCCzUftO8KOVkV4wQG1vkUvg',
