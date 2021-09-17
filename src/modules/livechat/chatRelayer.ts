@@ -54,6 +54,8 @@ export async function setupRelay (frame: DexFrame): Promise<void> {
   // chat.on ('end', (reason) => {
   //   console.log('stream ended');
   // })
+
+  chat.start({ignoreFirstResponse: true})
 }
 
 export interface ChatComment {
