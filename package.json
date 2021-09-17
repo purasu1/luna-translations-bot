@@ -8,7 +8,7 @@
     "typedoc": "typedoc"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=16.6"
   },
   "repository": {
     "type": "git",
