@@ -13,11 +13,14 @@ export async function retryIfStillUpThenPostLog (
   const isStillOn = <boolean> allFrames?.some (frame_ => frame_.id === frame.id)
 
   deleteChatProcess (frame.id)
-  retries[frame.id] = (retries[frame.id] ?? 0) + 1
-  if (isStillOn && retries[frame.id] <= 5) {
-    debug (`Pytchat crashed on ${frame.id}, trying to reconnect in 5s`)
-    setTimeout (() => setupRelay (frame), 5000)
+  if (retries[frame.id]?.[1] === 'upcoming' && frame.status === 'live') delete retries[frame.id]
+  retries[frame.id] = [(retries[frame.id]?.[0] ?? 0) + 1, frame.status]
+  setTimeout (() => delete retries[frame.id], 600000)
+  if (isStillOn && retries[frame.id]?.[0] <= 15) {
+    debug (`Pytchat crashed on ${frame.id}, trying to reconnect in 2s`)
+    setTimeout (() => setupRelay (frame), 2000)
   } else {
+    debug (`${frame.id} not in ${allFrames.map(f => f.id)}`)
     log (`${frame.status} ${frame.id} closed with exit code ${exitCode}`)
     delete retries[frame.id]
     sendAndForgetHistory (frame.id)
@@ -26,7 +29,7 @@ export async function retryIfStillUpThenPostLog (
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const retries: Record<VideoId, number> = {}
+const retries: Record<VideoId, [number, string]> = {}
 
 async function sendAndForgetHistory (videoId: VideoId): Promise<void> {
   const relevantHistories = getAllRelayHistories ()

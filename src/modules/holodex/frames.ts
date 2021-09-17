@@ -4,7 +4,23 @@ import { debug, getJson, isEven, Params, removeDupeObjects, sleep } from '../../
 import { asyncTryOrLog } from '../../helpers/tryCatch'
 const { max, ceil } = Math
 
-export async function getFrameList () {
+let frameList: DexFrame[] = []
+setInterval (async () => {
+  frameList = await __getFrameList ()
+}, 30000)
+
+export async function getFrameList (): Promise<DexFrame[]> {
+  if (frameList.length === 0) frameList = await __getFrameList ()
+  return frameList
+}
+
+export async function __getFrameList (): Promise<DexFrame[]> {
+  const attempt = await _getFrameList ()
+  if (attempt.length === 0) debug ('Failed to get frames. restarting.')
+  return attempt.length === 0 ? getFrameList () : attempt
+}
+
+export async function _getFrameList () {
   const firstPg   = await getOneFramePage ()
   const total     = parseInt (firstPg?.total ?? '0')
   const remaining = max (0, ceil (total / 50) - 1)
@@ -77,10 +93,10 @@ async function getFramePages (
   // Use an imperative loop to delay each call so as not to spam the API
   try {
     const pages = []
-    for (const page of range (offset, limit)) {
+    for (const page of range (offset, limit+Math.ceil(limit/10))) {
       await sleep (1000)
       pages.push (await getJson (
-        framesUrl + Params ({ ...params, offset: (50 * page).toString ()}),
+        framesUrl + Params ({ ...params, offset: (45 * page).toString ()}),
         { headers: { 'X-APIKEY': config.holodexKey! } }
       ))
     }

@@ -41,6 +41,20 @@ export const indies = [
     groups: ['indies'], twitter: 'Ririsya_music',
     aliases: ['ririsya']
   },
+  {
+    name: 'wanwangomigomi', ytId: 'UCpXYzk_uutXwHCpr2lcRN3w',
+    chName: '西沢5ミリ',
+    picture: '',
+    groups: ['indies', 'parents'], twitter: 'wanwangomigomi',
+    aliases: ['']
+  },
+  {
+    name: 'Nachoneko', ytId: 'UCvNn6mRroGDctnqU-FUsszg',
+    chName: 'Nachoneko / 甘城なつき',
+    picture: '',
+    groups: ['indies', 'parents'], twitter: 'amsrntk3',
+    aliases: ['nachoneko']
+  },
   // {
     // name: 'tam', ytId: 'UCVTRz4yxAm0m3jo_4tpEcZw',
     // chName: 'タム',
