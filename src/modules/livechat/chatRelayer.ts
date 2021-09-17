@@ -36,7 +36,7 @@ function toChatComments(chats: AddChatItemAction[]) : ChatComment[] {
 }
 
 export async function setupRelay (frame: DexFrame): Promise<void> {
-  const chat =  getChatProcess (frame.id, frame.channel.id)
+  const chat = getChatProcess (frame.id, frame.channel.id)
 
   chat.removeAllListeners ('chats')
   chat.on ('chats', async chats => {

@@ -23,6 +23,7 @@ export async function retryIfStillUpThenPostLog (
     setTimeout (() => setupRelay (frame), 2000)
   } else {
     debug (`${frame.id} not in ${allFrames.map(f => f.id)}`)
+    
     if (error instanceof MasterchatError) {
       log (`${frame.status} ${frame.id} closed with mc error code: ${error.code}`)
     } else {
