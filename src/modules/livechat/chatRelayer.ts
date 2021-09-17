@@ -49,7 +49,11 @@ export async function setupRelay (frame: DexFrame): Promise<void> {
     tasks.forEach (runTask)
   })
 
-  chat.on ('end', (reason) => retryIfStillUpThenPostLog (frame, reason))
+  chat.on ('error', (error) => retryIfStillUpThenPostLog (frame, error))
+
+  // chat.on ('end', (reason) => {
+  //   console.log('stream ended');
+  // })
 }
 
 export interface ChatComment {
