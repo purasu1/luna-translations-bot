@@ -26,7 +26,7 @@ if (isMainThread) frameEmitter.on ('frame', (frame: DexFrame) => {
 
 function toChatComments(chats: AddChatItemAction[]) : ChatComment[] {
   return chats.map(chat => ({
-    id: chat.id,
+    id: chat.authorChannelId,
     name: chat.authorName,
     body: runsToString(chat.rawMessage, {spaces:true}),
     time: chat.timestamp.getTime(),
