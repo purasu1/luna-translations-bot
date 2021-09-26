@@ -39,6 +39,8 @@ export async function setupRelay (frame: DexFrame): Promise<void> {
   const chat = getChatProcess (frame.id, frame.channel.id)
 
   chat.removeAllListeners ('chats')
+  chat.removeAllListeners ('error')
+
   chat.on ('chats', async chats => {
     const cmts = toChatComments(chats)
     const tasks: Task[] = await piscina.run ({
