@@ -214,7 +214,7 @@ export const hololive = [
     chName: "Polka Ch. 尾丸ポルカ",
     picture: 'https://yt3.ggpht.com/ytc/AAUvwnh-sak3t15svmMDNF8w_uxnNEChOL7C1DKAO-Ht=s800-c-k-c0x00ffffff-no-rj',
     groups: ['5th Generation'], twitter: 'omarupolka',
-    aliases: ['polka', 'omaru', 'ポル', 'おまる']
+    aliases: ['polka', 'omaru', 'ポル', 'おまる', 'omarun']
   },
   {
     name: 'Arurandeisu', ytId: 'UCKeAhJvy8zgXWbh9duVjIaQ',
@@ -319,7 +319,7 @@ export const hololive = [
     chName: "Botan Ch.獅白ぼたん",
     picture: 'https://yt3.ggpht.com/ytc/AAUvwngRC-JqguPnj9ljVH3UulyfdlyQzLYzLeSrhvD6=s800-c-k-c0x00ffffff-no-rj',
     groups: ['5th Generation'], twitter: 'shishirobotan',
-    aliases: ['botan', 'ぼたん']
+    aliases: ['botan', 'ぼたん', 'shishiron', 'bossan']
   },
   {
     name: 'Nekomata Okayu', ytId: 'UCvaTdHTWBGv3MKj3KVqJVCw',

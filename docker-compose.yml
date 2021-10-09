@@ -7,8 +7,6 @@ services:
       DISCORD_PROD_TOKEN: ${DISCORD_PROD_TOKEN}
       DEEPL_KEY: ${DEEPL_KEY}
       MONGODB_URL: mongodb://db/luna
-    volumes:
-      - ./data/logs:/app/logs
     depends_on:
       - db
 

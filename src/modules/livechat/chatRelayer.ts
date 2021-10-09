@@ -12,6 +12,7 @@ import { frameEmitter } from '../holodex/frameEmitter'
 import { isMainThread } from 'worker_threads'
 import { resolve } from 'path'
 import { Task } from './chatRelayerWorker'
+import { AddChatItemAction, runsToString } from 'masterchat'
 const Piscina = require ('piscina')
 
 const piscina = new Piscina ({
@@ -23,21 +24,42 @@ if (isMainThread) frameEmitter.on ('frame', (frame: DexFrame) => {
   if (isPublic (frame)) setupRelay (frame)
 })
 
-export function setupRelay (frame: DexFrame): void {
-  const chat = getChatProcess (frame.id)
+function toChatComments(chats: AddChatItemAction[]) : ChatComment[] {
+  return chats.map(chat => ({
+    id: chat.authorChannelId,
+    name: chat.authorName,
+    body: runsToString(chat.rawMessage, {spaces:true}),
+    time: chat.timestamp.getTime(),
+    isMod: chat.isModerator,
+    isOwner: chat.isOwner
+  }))
+}
 
-  chat.stdout.removeAllListeners ('data')
-  chat.stdout.on ('data', async data => {
+export async function setupRelay (frame: DexFrame): Promise<void> {
+  const chat = getChatProcess (frame.id, frame.channel.id)
+
+  chat.removeAllListeners ('chats')
+  chat.removeAllListeners ('error')
+  chat.removeAllListeners ('end')
+
+  chat.on ('chats', async chats => {
+    const cmts = toChatComments(chats)
     const tasks: Task[] = await piscina.run ({
       frame,
-      cmts: extractComments(data),
+      cmts,
       allEntries
     })
     tasks.forEach (runTask)
   })
 
-  chat.removeAllListeners ('close')
-  chat.on ('close', exitCode => retryIfStillUpThenPostLog (frame, exitCode))
+  chat.on ('error', (error) => retryIfStillUpThenPostLog (frame, error))
+  chat.on ('end', () => { retryIfStillUpThenPostLog (frame) })
+
+  // chat.on ('end', (reason) => {
+  //   console.log('stream ended');
+  // })
+
+  chat.listen({ignoreFirstResponse: true})
 }
 
 export interface ChatComment {

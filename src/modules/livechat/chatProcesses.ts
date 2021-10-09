@@ -1,9 +1,9 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
+import { Masterchat } from 'masterchat'
 import { VideoId } from '../holodex/frames'
 
 /** Returns a singleton of the chat process for a given video ID */
-export function getChatProcess (videoId: VideoId): ChatProcess {
-  return chatProcesses[videoId] ??= spawnChatProcess (videoId)
+export function getChatProcess (videoId: VideoId, channelId: string): ChatProcess {
+  return chatProcesses[videoId] ??= new Masterchat (videoId, channelId, {mode: "live"})
 }
 
 export function chatProcessExists (videoId: VideoId): boolean {
@@ -16,10 +16,6 @@ export function deleteChatProcess (videoId: VideoId): void {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type ChatProcess = ChildProcessWithoutNullStreams
+type ChatProcess = Masterchat
 
 const chatProcesses: Record<VideoId, ChatProcess> = {}
-
-function spawnChatProcess (liveId: VideoId): ChatProcess {
-  return spawn ('python3', ['-u', './chat_dl.py', liveId])
-}

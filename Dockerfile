@@ -8,11 +8,6 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# install pytchat
-RUN python3 -m pip install pytchat
-RUN mkdir logs
-COPY chat_dl.py ./
-
 # build ts files
 COPY ./src ./src
 COPY tsconfig.json ./
