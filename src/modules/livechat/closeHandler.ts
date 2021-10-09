@@ -8,25 +8,25 @@ import { deleteChatProcess } from "./chatProcesses"
 import { findFrameThread, setupRelay } from "./chatRelayer"
 
 export async function retryIfStillUpThenPostLog (
-  frame: DexFrame, error: MasterchatError|Error|undefined = undefined
+  frame: DexFrame, errorCode?: string
 ): Promise<void> {
   const allFrames = await getFrameList ()
   const isStillOn = <boolean> allFrames?.some (frame_ => frame_.id === frame.id)
-  const isMembersOnly = error instanceof MasterchatError && error.code === 'membersOnly'
-  const isDisabled = error instanceof MasterchatError && error.code === 'disabled'
+  const isMembersOnly = errorCode === 'membersOnly'
+  const isDisabled = errorCode === 'disabled'
 
   deleteChatProcess (frame.id)
   if (retries[frame.id]?.[1] === 'upcoming' && frame.status === 'live') delete retries[frame.id]
   retries[frame.id] = [(retries[frame.id]?.[0] ?? 0) + 1, frame.status]
   setTimeout (() => delete retries[frame.id], 600000)
-  if (isStillOn && retries[frame.id]?.[0] <= 15 && !isMembersOnly && !isDisabled && error) {
+  if (isStillOn && retries[frame.id]?.[0] <= 15 && !isMembersOnly && !isDisabled && errorCode) {
     debug (`masterchat exited on ${frame.id}, trying to reconnect in 5s`)
     setTimeout (() => setupRelay (frame), 2000)
   } else {
-    if (error instanceof MasterchatError) {
-      log (`${frame.status} ${frame.id} closed with mc error code: ${error.code}`)
+    if (errorCode) {
+      log (`${frame.status} ${frame.id} closed with mc error code: ${errorCode}`)
     } else {
-      log (`${frame.status} ${frame.id} closed with unrecognized error: ${error?.message}`)
+      log (`${frame.status} ${frame.id} closed with unrecognized error.`)
     }
     delete retries[frame.id]
     sendAndForgetHistory (frame.id)
