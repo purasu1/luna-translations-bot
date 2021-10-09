@@ -105,7 +105,10 @@ function relayCameo (
   { discordCh, to, cmt, deepLTl, frame, g }: RelayData, isGossip?: boolean
 ): SendMessageTask {
   const cleaned = cmt.body.replaceAll ('`', "'")
-  const emj     = isGossip ? emoji.peek : emoji.holo
+  const stalked = streamers.find (s => s.ytId === cmt.id)
+  const groups  = stalked?.groups as string[]|undefined
+  const camEmj  = groups?.includes ('Nijisanji') ? emoji.niji : emoji.holo
+  const emj     = isGossip ? emoji.peek : camEmj
   const line1   = `${emj} **${cmt.name}** in **${to}**'s chat: \`${cleaned}\``
   const line2   = deepLTl ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\`` : ''
   const line3   = `\n<https://youtu.be/${frame.id}>`
@@ -136,8 +139,11 @@ function relayTlOrStreamerComment (
                 || isStreamer (cmt.id)
                 || (cmt.isMod && g.modMessages && !isBlacklistedOrUnwanted (cmt, g))
 
+  const vauthor = streamers.find (s => s.ytId === cmt.id)
+  const groups  = vauthor?.groups as string[]|undefined
+  const vemoji  = groups?.includes ('Nijisanji') ? emoji.niji : emoji.holo
   const premoji = isTl (cmt.body, g)  ? ':speech_balloon:'
-                : isStreamer (cmt.id) ? emoji.holo
+                : isStreamer (cmt.id) ? vemoji
                                       : ':tools:'
 
   const url = frame.status === 'live' ? ''

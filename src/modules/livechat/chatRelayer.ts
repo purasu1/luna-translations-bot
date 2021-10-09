@@ -40,6 +40,7 @@ export async function setupRelay (frame: DexFrame): Promise<void> {
 
   chat.removeAllListeners ('chats')
   chat.removeAllListeners ('error')
+  chat.removeAllListeners ('end')
 
   chat.on ('chats', async chats => {
     const cmts = toChatComments(chats)
@@ -52,6 +53,7 @@ export async function setupRelay (frame: DexFrame): Promise<void> {
   })
 
   chat.on ('error', (error) => retryIfStillUpThenPostLog (frame, error))
+  chat.on ('end', () => { retryIfStillUpThenPostLog (frame) })
 
   // chat.on ('end', (reason) => {
   //   console.log('stream ended');

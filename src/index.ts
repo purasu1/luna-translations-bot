@@ -7,6 +7,7 @@ dotenv.config ({ path: __dirname+'/../.env' })
 import { config } from './config'
 import { client } from './core/'
 import mongoose from 'mongoose'
+import path from 'path'
 
 const MONGODB_URL = process.env.MONGODB_URL ?? 'mongodb://localhost/luna'
 

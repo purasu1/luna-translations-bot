@@ -319,7 +319,7 @@ export const hololive = [
     chName: "Botan Ch.獅白ぼたん",
     picture: 'https://yt3.ggpht.com/ytc/AAUvwngRC-JqguPnj9ljVH3UulyfdlyQzLYzLeSrhvD6=s800-c-k-c0x00ffffff-no-rj',
     groups: ['5th Generation'], twitter: 'shishirobotan',
-    aliases: ['botan', 'ぼたん']
+    aliases: ['botan', 'ぼたん', 'shishiron', 'bossan']
   },
   {
     name: 'Nekomata Okayu', ytId: 'UCvaTdHTWBGv3MKj3KVqJVCw',
