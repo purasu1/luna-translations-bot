@@ -85,7 +85,11 @@ function runTask (task: Task): void {
     const thread = task.tlRelay
       ? findFrameThread (task.vId, task.g)
       : null
-      send (thread ?? ch, task.content)
+
+
+    console.log (`${task.vId} | ${task.content}`)
+    send (thread ?? ch, task.content)
+
       .then (msg => {
         if (task.save && msg) {
           saveComment (

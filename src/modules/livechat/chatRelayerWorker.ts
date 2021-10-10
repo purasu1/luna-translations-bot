@@ -6,13 +6,8 @@ import { Snowflake } from 'discord.js'
 import { tl } from '../deepl'
 import { isBlacklistedOrUnwanted, isHoloID, isStreamer, isTl } from './commentBooleans'
 import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db/models'
-import { ChatComment, Entries } from './chatRelayer'
+import { ChatComment } from './chatRelayer'
 import { AddChatItemAction, runsToString, MasterchatError, Masterchat } from 'masterchat'
-
-// export default (input: ChatWorkerInput): Promise<Task[]> => {
-  // allEntries = input.allEntries
-  // return processComments (input.frame, input.cmts)
-// }
 
 export default (input: ChatWorkerInput): void => {
   allEntries = input.allEntries
@@ -117,9 +112,9 @@ async function processComments (
       || f === 'gossip'
     )
 
-    const logTask: LogCommentTask = {
-      _tag: 'LogCommentTask', cmt, frame, streamer
-    }
+    // const logTask: LogCommentTask = {
+      // _tag: 'LogCommentTask', cmt, frame, streamer
+    // }
 
     const mustSave = isTl (cmt.body) || isStreamer (cmt.id)
 
@@ -145,7 +140,7 @@ async function processComments (
       })
     }).filter (x => x !== undefined) as Task[]
 
-    return [logTask, ...sendTasks, ...(mustSave ? [saveTask] : [])]
+    return [...sendTasks, ...(mustSave ? [saveTask] : [])]
   }))
 
   return tasks.flat ()
