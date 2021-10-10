@@ -16,7 +16,14 @@ import { AddChatItemAction, runsToString, MasterchatError, Masterchat } from 'ma
 
 export default (input: ChatWorkerInput): void => {
   allEntries = input.allEntries
-  input.port.on ('message', (entries: Entries) => { allEntries = entries })
+  input.port.on ('message', (msg: any) => { // TODO: refine any
+    if (msg._tag === 'EntryUpdate') {
+      allEntries = msg.entries
+    }
+    if (msg._tag === 'FrameUpdate') { // TODO: don't mutate input
+      input.frame.status = msg.status
+    }
+  })
   const chat =
     new Masterchat (input.frame.id, input.frame.channel.id, { mode: 'live' })
 

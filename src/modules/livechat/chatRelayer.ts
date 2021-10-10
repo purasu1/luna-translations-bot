@@ -25,7 +25,13 @@ if (isMainThread) frameEmitter.on ('frame', (frame: DexFrame) => {
 const masterchats: Record<VideoId, any> = {} // Figure out why MessagePort type broken
 
 export async function setupRelay (frame: DexFrame): Promise<void> {
-  if (masterchats[frame.id]) return
+  if (masterchats[frame.id]) {
+    masterchats[frame.id].postMessage({
+      _tag: 'FrameUpdate',
+      status: frame.status
+    })
+    return
+  }
   
   const { port1, port2 } = new MessageChannel ()
 
@@ -57,7 +63,10 @@ setInterval (() => {
   allEntries = guilds.flatMap (g => features.flatMap (f => g[f].map (e =>
     [g, f, e] as [GuildSettings, WatchFeature, WatchFeatureSettings]
   )))
-  Object.values (masterchats).forEach (port => port.postMessage (allEntries))
+  Object.values (masterchats).forEach (port => port.postMessage ({
+    _tag: 'EntryUpdate',
+    allEntries
+  }))
 }, 5000)
 
 function runTask (task: Task): void {
