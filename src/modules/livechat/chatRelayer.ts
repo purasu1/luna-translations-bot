@@ -65,7 +65,7 @@ setInterval (() => {
   )))
   Object.values (masterchats).forEach (port => port.postMessage ({
     _tag: 'EntryUpdate',
-    allEntries
+    entries: allEntries
   }))
 }, 5000)
 
