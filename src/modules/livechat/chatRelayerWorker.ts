@@ -195,7 +195,9 @@ function relayTlOrStreamerComment (
 
   const author = isTl (cmt.body, g) ? `||${cmt.name}:||` : `**${cmt.name}:**`
   const text   = cmt.body.replaceAll ('`', "''")
-  const tl     = deepLTl ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\`` : ''
+  const tl     = deepLTl && g.deepl
+    ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\``
+    : ''
 
   return mustPost
     ? {
