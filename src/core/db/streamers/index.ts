@@ -2,16 +2,20 @@
 import { Message } from 'discord.js'
 import { ciEquals } from '../../../helpers'
 import { createEmbed, reply } from '../../../helpers/discord'
+import {YouTubeChannelId} from '../../../modules/holodex/frames'
 import { ValidatedOptions } from '../functions'
 import { hololive } from './hololive'
 import { indies } from './indies'
 import { nijisanji } from './nijisanji'
 
-export const streamers = StreamerArray([
+export const streamers = StreamerArray ([
   ...hololive,
   ...nijisanji,
   ...indies
 ] as const)
+
+export const streamersMap: Map<YouTubeChannelId, Streamer> =
+  new Map (streamers.map (s => [s.ytId, s]))
 
 export const names          = streamers.map (x => x.name)
 export const twitters       = streamers.map (x => x.twitter)

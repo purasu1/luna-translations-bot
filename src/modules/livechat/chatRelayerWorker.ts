@@ -1,6 +1,6 @@
 import { ciEquals, doNothing, match } from '../../helpers'
 import { DexFrame } from '../holodex/frames'
-import { Streamer, StreamerName, streamers } from '../../core/db/streamers'
+import { Streamer, StreamerName, streamers, streamersMap } from '../../core/db/streamers'
 import { emoji } from '../../helpers/discord'
 import { Snowflake } from 'discord.js'
 import { tl } from '../deepl'
@@ -100,8 +100,8 @@ async function processComments (
   frame: DexFrame, cmts: ChatComment[]
 ): Promise<Task[]> {
   const tasks = await Promise.all (cmts.flatMap (async cmt => {
-    const streamer    = streamers.find (s => s.ytId === frame.channel.id)
-    const author      = streamers.find (s => s.ytId === cmt.id)
+    const streamer    = streamersMap.get (frame.channel.id)
+    const author      = streamersMap.get (cmt.id)
     const isCameo     = isStreamer (cmt.id) && !cmt.isOwner
     const mustDeepL   = isStreamer (cmt.id) && !isHoloID (streamer)
     const deepLTl     = mustDeepL ? await tl (cmt.body) : undefined
@@ -111,10 +111,6 @@ async function processComments (
       [(f === 'cameos' ? author : streamer)?.name, 'all'].includes (e.streamer)
       || f === 'gossip'
     )
-
-    // const logTask: LogCommentTask = {
-      // _tag: 'LogCommentTask', cmt, frame, streamer
-    // }
 
     const mustSave = isTl (cmt.body) || isStreamer (cmt.id)
 

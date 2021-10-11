@@ -1,5 +1,5 @@
 import { GuildSettings } from '../../core/db/models'
-import { Streamer, streamers } from '../../core/db/streamers'
+import { Streamer, streamers, streamersMap } from '../../core/db/streamers'
 import { ChatComment } from './chatRelayer'
 
 const tlPatterns: RegExp[] = [
@@ -38,5 +38,5 @@ export function isHoloID (streamer?: Streamer): boolean {
 }
 
 export function isStreamer (ytId: string): boolean {
-  return streamers.some (s => s.ytId === ytId)
+  return Boolean (streamersMap.get (ytId))
 }
