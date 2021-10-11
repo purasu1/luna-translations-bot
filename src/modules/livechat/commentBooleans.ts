@@ -1,5 +1,6 @@
 import { GuildSettings } from '../../core/db/models'
-import { Streamer, streamers, streamersMap } from '../../core/db/streamers'
+import { Streamer, streamers, streamersYtIdSet } from '../../core/db/streamers'
+import {YouTubeChannelId} from '../holodex/frames'
 import { ChatComment } from './chatRelayer'
 
 const tlPatterns: RegExp[] = [
@@ -7,6 +8,12 @@ const tlPatterns: RegExp[] = [
   /([(\[/\［\【]|^)(tl|eng?)[\]):\】\］]/i, // (eng?/tl]:
   /^[\[(](eng?|tl)/i,                       // TLs who forget closing bracket
 ]
+
+const holoID: Set<YouTubeChannelId> = new Set (
+  streamers
+    .filter (s => s.groups.some (g => g.includes ('Indonesia')))
+    .map (s => s.ytId)
+)
 
 export function isTl (cmt: string, g?: GuildSettings): boolean {
   return tlPatterns.some (pattern => pattern.test (cmt))
@@ -34,9 +41,9 @@ export function isBlacklisted (ytId: string, g: GuildSettings): boolean {
 }
 
 export function isHoloID (streamer?: Streamer): boolean {
-  return <boolean> streamer?.groups.some (g => g.includes ('Indonesia'))
+  return !!streamer && holoID.has (streamer.ytId)
 }
 
 export function isStreamer (ytId: string): boolean {
-  return Boolean (streamersMap.get (ytId))
+  return streamersYtIdSet.has (ytId)
 }

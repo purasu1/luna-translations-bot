@@ -17,6 +17,9 @@ export const streamers = StreamerArray ([
 export const streamersMap: Map<YouTubeChannelId, Streamer> =
   new Map (streamers.map (s => [s.ytId, s]))
 
+export const streamersYtIdSet: Set<YouTubeChannelId> =
+  new Set (streamers.map (s => s.ytId))
+
 export const names          = streamers.map (x => x.name)
 export const twitters       = streamers.map (x => x.twitter)
 export type StreamerName    = typeof names[number] | 'all'
