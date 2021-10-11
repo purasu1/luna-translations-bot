@@ -53,7 +53,7 @@ export interface ChatComment {
 
 export type Entry = [GuildSettings, Blacklist, WatchFeature, WatchFeatureSettings]
 export type Entries = Entry[]
-export type Blacklist = YouTubeChannelId[]
+export type Blacklist = Set<YouTubeChannelId>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -63,7 +63,7 @@ let allEntries: [GuildSettings, Blacklist, WatchFeature, WatchFeatureSettings][]
 setInterval (() => {
   const guilds = getAllSettings ()
   allEntries = guilds.flatMap (g => features.flatMap (f => g[f].map (e => {
-    const bl = g.blacklist.map (i => i.ytId)
+    const bl = new Set (g.blacklist.map (i => i.ytId))
     return [g, bl, f, e] as Entry
   })))
   Object.values (masterchats).forEach (port => port.postMessage ({
@@ -143,11 +143,4 @@ function saveComment (
     stream:       frame.id,
     absoluteTime: cmt.time
   }, gid!)
-}
-
-function extractComments (jsonl: any): ChatComment[] {
-  const cmts = String (jsonl)
-    .split ('\n')
-    .filter (x => x !== '')
-  return tryOrDefault (() => cmts.map (cmt => JSON.parse (cmt)), [])
 }
