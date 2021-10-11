@@ -20,10 +20,9 @@ export async function __getFrameList (): Promise<DexFrame[]> {
   return attempt.length === 0 ? getFrameList () : attempt
 }
 
-export async function _getFrameList () {
-  const firstPg   = await getOneFramePage ()
-  const hasFailed = !firstPg
-  return hasFailed ? [] : firstPg
+export async function _getFrameList (): Promise<DexFrame[]> {
+  const firstPg = await getOneFramePage ()
+  return firstPg == undefined ? [] : firstPg.items
 }
 
 export function isPublic (frame: DexFrame): boolean {
