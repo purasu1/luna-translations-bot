@@ -22,7 +22,7 @@ export const deepl: Command = {
       enable: `
         ${emoji.deepl} I will now translate Hololive members' chats with DeepL.
       `,
-      disable: `
+      disable: oneLine`
         ${emoji.deepl} I will no longer translate Hololive members' chats
         with DeepL.
       `

@@ -20,14 +20,9 @@ export async function __getFrameList (): Promise<DexFrame[]> {
   return attempt.length === 0 ? getFrameList () : attempt
 }
 
-export async function _getFrameList () {
-  const firstPg   = await getOneFramePage ()
-  const total     = parseInt (firstPg?.total ?? '0')
-  const remaining = max (0, ceil (total / 50) - 1)
-  const otherPgs  = await getFramePages ({ offset: 1, limit: remaining })
-  const frames    = otherPgs?.flatMap?. (pg => pg?.items)
-  const hasFailed = !firstPg || !otherPgs
-  return hasFailed ? [] : removeDupeObjects ([...firstPg!.items, ...frames!])
+export async function _getFrameList (): Promise<DexFrame[]> {
+  const firstPg = await getOneFramePage ()
+  return firstPg == undefined ? [] : firstPg.items
 }
 
 export function isPublic (frame: DexFrame): boolean {
@@ -75,7 +70,7 @@ export type YouTubeChannelId = string
 const framesUrl = 'https://holodex.net/api/v2/live?'
 const params = {
   include: 'description',
-  limit: '50',
+  limit: '9999',
   paginated:'1',
   max_upcoming_hours: '999999'
 }
@@ -96,7 +91,7 @@ async function getFramePages (
     for (const page of range (offset, limit+Math.ceil(limit/10))) {
       await sleep (1000)
       pages.push (await getJson (
-        framesUrl + Params ({ ...params, offset: (45 * page).toString ()}),
+        framesUrl + Params ({ ...params, offset: (4500 * page).toString ()}),
         { headers: { 'X-APIKEY': config.holodexKey! } }
       ))
     }

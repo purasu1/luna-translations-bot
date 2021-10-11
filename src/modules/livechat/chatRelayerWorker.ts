@@ -7,15 +7,42 @@ import { tl } from '../deepl'
 import { isBlacklistedOrUnwanted, isHoloID, isStreamer, isTl } from './commentBooleans'
 import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db/models'
 import { ChatComment } from './chatRelayer'
+import { AddChatItemAction, runsToString, MasterchatError, Masterchat } from 'masterchat'
 
-export default (input: ChatWorkerInput): Promise<Task[]> => {
+export default (input: ChatWorkerInput): void => {
   allEntries = input.allEntries
-  return processComments (input.frame, input.cmts)
+  input.port.on ('message', (msg: any) => { // TODO: refine any
+    if (msg._tag === 'EntryUpdate') {
+      allEntries = msg.entries
+    }
+    if (msg._tag === 'FrameUpdate') { // TODO: don't mutate input
+      input.frame.status = msg.status
+    }
+  })
+  const chat =
+    new Masterchat (input.frame.id, input.frame.channel.id, { mode: 'live' })
+
+  chat.on ('chats', async chats => {
+    const cmtTasks = await processComments (input.frame, toChatComments (chats))
+    cmtTasks.forEach (task => input.port.postMessage (task))
+  })
+
+  chat.on ('error', err => input.port.postMessage ({
+    _tag: 'EndTask',
+    frame: input.frame,
+    errorCode: err instanceof MasterchatError ? err.code : undefined
+  }))
+
+  chat.on ('end', () => input.port.postMessage ({
+    _tag: 'EndTask', frame: input.frame
+  }))
+
+  chat.listen ({ ignoreFirstResponse: true })
 }
 
 interface ChatWorkerInput {
+  port: any // figure out why MessagePort type is broken
   frame: DexFrame
-  cmts: ChatComment[]
   allEntries: [GuildSettings, WatchFeature, WatchFeatureSettings][]
 }
 
@@ -45,11 +72,29 @@ interface SaveMessageTask {
   chId?: Snowflake
 }
 
-export type Task = SendMessageTask | SaveMessageTask | LogCommentTask
+interface EndTask {
+  _tag: 'EndTask'
+  frame: DexFrame
+  errorCode?: string
+}
+
+export type Task = SendMessageTask | SaveMessageTask | LogCommentTask | EndTask
 
 ///////////////////////////////////////////////////////////////////////////////
 
 let allEntries: [GuildSettings, WatchFeature, WatchFeatureSettings][] = []
+
+
+function toChatComments (chats: AddChatItemAction[]): ChatComment[] {
+  return chats.map (chat => ({
+    id: chat.authorChannelId,
+    name: chat.authorName,
+    body: runsToString(chat.rawMessage, {spaces:true}),
+    time: chat.timestamp.getTime(),
+    isMod: chat.isModerator,
+    isOwner: chat.isOwner
+  }))
+}
 
 async function processComments (
   frame: DexFrame, cmts: ChatComment[]
@@ -67,9 +112,9 @@ async function processComments (
       || f === 'gossip'
     )
 
-    const logTask: LogCommentTask = {
-      _tag: 'LogCommentTask', cmt, frame, streamer
-    }
+    // const logTask: LogCommentTask = {
+      // _tag: 'LogCommentTask', cmt, frame, streamer
+    // }
 
     const mustSave = isTl (cmt.body) || isStreamer (cmt.id)
 
@@ -95,7 +140,7 @@ async function processComments (
       })
     }).filter (x => x !== undefined) as Task[]
 
-    return [logTask, ...sendTasks, ...(mustSave ? [saveTask] : [])]
+    return [...sendTasks, ...(mustSave ? [saveTask] : [])]
   }))
 
   return tasks.flat ()
@@ -152,7 +197,9 @@ function relayTlOrStreamerComment (
 
   const author = isTl (cmt.body, g) ? `||${cmt.name}:||` : `**${cmt.name}:**`
   const text   = cmt.body.replaceAll ('`', "''")
-  const tl     = deepLTl ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\`` : ''
+  const tl     = deepLTl && g.deepl
+    ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\``
+    : ''
 
   return mustPost
     ? {

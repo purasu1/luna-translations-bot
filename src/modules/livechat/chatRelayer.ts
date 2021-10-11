@@ -1,7 +1,5 @@
-import { doNothing } from '../../helpers'
 import { tryOrDefault } from '../../helpers/tryCatch'
 import { DexFrame, isPublic, VideoId } from '../holodex/frames'
-import { getChatProcess } from './chatProcesses'
 import { findTextChannel, send } from '../../helpers/discord'
 import { Snowflake, TextChannel, ThreadChannel } from 'discord.js'
 import { addToGuildRelayHistory, getGuildData, getAllSettings, addToBotRelayHistory } from '../../core/db/functions'
@@ -9,14 +7,14 @@ import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db
 import { retryIfStillUpThenPostLog } from './closeHandler'
 import { logCommentData } from './logging'
 import { frameEmitter } from '../holodex/frameEmitter'
-import { isMainThread } from 'worker_threads'
+import { isMainThread, MessageChannel } from 'worker_threads'
 import { resolve } from 'path'
 import { Task } from './chatRelayerWorker'
-import { AddChatItemAction, runsToString } from 'masterchat'
 const Piscina = require ('piscina')
 
 const piscina = new Piscina ({
   filename: resolve(__dirname, 'chatRelayerWorker.js'),
+  useAtomics: false,
   idleTimeout: 99999999
 })
 
@@ -24,42 +22,24 @@ if (isMainThread) frameEmitter.on ('frame', (frame: DexFrame) => {
   if (isPublic (frame)) setupRelay (frame)
 })
 
-function toChatComments(chats: AddChatItemAction[]) : ChatComment[] {
-  return chats.map(chat => ({
-    id: chat.authorChannelId,
-    name: chat.authorName,
-    body: runsToString(chat.rawMessage, {spaces:true}),
-    time: chat.timestamp.getTime(),
-    isMod: chat.isModerator,
-    isOwner: chat.isOwner
-  }))
-}
+const masterchats: Record<VideoId, any> = {} // Figure out why MessagePort type broken
 
 export async function setupRelay (frame: DexFrame): Promise<void> {
-  const chat = getChatProcess (frame.id, frame.channel.id)
-
-  chat.removeAllListeners ('chats')
-  chat.removeAllListeners ('error')
-  chat.removeAllListeners ('end')
-
-  chat.on ('chats', async chats => {
-    const cmts = toChatComments(chats)
-    const tasks: Task[] = await piscina.run ({
-      frame,
-      cmts,
-      allEntries
+  if (masterchats[frame.id]) {
+    masterchats[frame.id].postMessage({
+      _tag: 'FrameUpdate',
+      status: frame.status
     })
-    tasks.forEach (runTask)
-  })
+    return
+  }
+  
+  const { port1, port2 } = new MessageChannel ()
 
-  chat.on ('error', (error) => retryIfStillUpThenPostLog (frame, error))
-  chat.on ('end', () => { retryIfStillUpThenPostLog (frame) })
+  masterchats[frame.id] = port2
+  
+  piscina.run ({ port: port1, frame, allEntries }, { transferList: [port1] })
 
-  // chat.on ('end', (reason) => {
-  //   console.log('stream ended');
-  // })
-
-  chat.listen({ignoreFirstResponse: true})
+  port2.on ('message', runTask)
 }
 
 export interface ChatComment {
@@ -71,6 +51,8 @@ export interface ChatComment {
   isOwner: boolean
 }
 
+export type Entries = [GuildSettings, WatchFeature, WatchFeatureSettings][]
+
 ///////////////////////////////////////////////////////////////////////////////
 
 const features: WatchFeature[] = ['relay', 'cameos', 'gossip']
@@ -81,9 +63,17 @@ setInterval (() => {
   allEntries = guilds.flatMap (g => features.flatMap (f => g[f].map (e =>
     [g, f, e] as [GuildSettings, WatchFeature, WatchFeatureSettings]
   )))
+  Object.values (masterchats).forEach (port => port.postMessage ({
+    _tag: 'EntryUpdate',
+    entries: allEntries
+  }))
 }, 5000)
 
 function runTask (task: Task): void {
+  if (task._tag === 'EndTask') {
+    delete masterchats[task.frame.id]
+    retryIfStillUpThenPostLog (task.frame, task.errorCode)
+  }
   if (task._tag === 'LogCommentTask') {
     logCommentData (task.cmt, task.frame, task.streamer)
   }
@@ -95,7 +85,11 @@ function runTask (task: Task): void {
     const thread = task.tlRelay
       ? findFrameThread (task.vId, task.g)
       : null
-      send (thread ?? ch, task.content)
+
+
+    console.log (`${task.vId} | ${task.content}`)
+    send (thread ?? ch, task.content)
+
       .then (msg => {
         if (task.save && msg) {
           saveComment (
