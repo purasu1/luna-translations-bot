@@ -1,5 +1,5 @@
 import { tryOrDefault } from '../../helpers/tryCatch'
-import { DexFrame, isPublic, VideoId } from '../holodex/frames'
+import { DexFrame, isPublic, VideoId, YouTubeChannelId } from '../holodex/frames'
 import { findTextChannel, send } from '../../helpers/discord'
 import { Snowflake, TextChannel, ThreadChannel } from 'discord.js'
 import { addToGuildRelayHistory, getGuildData, getAllSettings, addToBotRelayHistory } from '../../core/db/functions'
@@ -51,18 +51,21 @@ export interface ChatComment {
   isOwner: boolean
 }
 
-export type Entries = [GuildSettings, WatchFeature, WatchFeatureSettings][]
+export type Entry = [GuildSettings, Blacklist, WatchFeature, WatchFeatureSettings]
+export type Entries = Entry[]
+export type Blacklist = YouTubeChannelId[]
 
 ///////////////////////////////////////////////////////////////////////////////
 
 const features: WatchFeature[] = ['relay', 'cameos', 'gossip']
-let allEntries: [GuildSettings, WatchFeature, WatchFeatureSettings][] = []
+let allEntries: [GuildSettings, Blacklist, WatchFeature, WatchFeatureSettings][] = []
 
 setInterval (() => {
   const guilds = getAllSettings ()
-  allEntries = guilds.flatMap (g => features.flatMap (f => g[f].map (e =>
-    [g, f, e] as [GuildSettings, WatchFeature, WatchFeatureSettings]
-  )))
+  allEntries = guilds.flatMap (g => features.flatMap (f => g[f].map (e => {
+    const bl = g.blacklist.map (i => i.ytId)
+    return [g, bl, f, e] as Entry
+  })))
   Object.values (masterchats).forEach (port => port.postMessage ({
     _tag: 'EntryUpdate',
     entries: allEntries

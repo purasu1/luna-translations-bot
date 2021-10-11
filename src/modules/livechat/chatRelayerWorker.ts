@@ -6,7 +6,7 @@ import { Snowflake } from 'discord.js'
 import { tl } from '../deepl'
 import { isBlacklistedOrUnwanted, isHoloID, isStreamer, isTl } from './commentBooleans'
 import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db/models'
-import { ChatComment } from './chatRelayer'
+import { ChatComment, Entry, Entries, Blacklist } from './chatRelayer'
 import { AddChatItemAction, runsToString, MasterchatError, Masterchat } from 'masterchat'
 
 export default (input: ChatWorkerInput): void => {
@@ -43,7 +43,7 @@ export default (input: ChatWorkerInput): void => {
 interface ChatWorkerInput {
   port: any // figure out why MessagePort type is broken
   frame: DexFrame
-  allEntries: [GuildSettings, WatchFeature, WatchFeatureSettings][]
+  allEntries: Entries
 }
 
 interface LogCommentTask {
@@ -82,14 +82,14 @@ export type Task = SendMessageTask | SaveMessageTask | LogCommentTask | EndTask
 
 ///////////////////////////////////////////////////////////////////////////////
 
-let allEntries: [GuildSettings, WatchFeature, WatchFeatureSettings][] = []
+let allEntries: Entries = []
 
 
 function toChatComments (chats: AddChatItemAction[]): ChatComment[] {
   return chats.map (chat => ({
     id: chat.authorChannelId,
     name: chat.authorName,
-    body: runsToString(chat.rawMessage, {spaces:true}),
+    body: runsToString (chat.rawMessage, { spaces:true }),
     time: chat.timestamp.getTime(),
     isMod: chat.isModerator,
     isOwner: chat.isOwner
@@ -107,7 +107,7 @@ async function processComments (
     const deepLTl     = mustDeepL ? await tl (cmt.body) : undefined
     const mustShowTl  = mustDeepL && deepLTl !== cmt.body
     const maybeGossip = isStreamer (cmt.id) || isTl (cmt.body)
-    const entries     = allEntries.filter (([{}, f, e]) =>
+    const entries     = allEntries.filter (([{}, {}, f, e]) =>
       [(f === 'cameos' ? author : streamer)?.name, 'all'].includes (e.streamer)
       || f === 'gossip'
     )
@@ -121,7 +121,7 @@ async function processComments (
       type: 'bot'
     }
 
-    const sendTasks = entries.map (([g, f, e]) => {
+    const sendTasks = entries.map (([g, bl, f, e]) => {
       const getTask = match (f, {
         cameos: isCameo     ? relayCameo  : doNothing,
         gossip: maybeGossip ? relayGossip : doNothing,
@@ -129,7 +129,7 @@ async function processComments (
       })
 
       return getTask ({
-        e, cmt, frame, g,
+        e, bl, cmt, frame, g,
         discordCh: e.discordCh,
         deepLTl:   mustShowTl ? deepLTl : undefined,
         to:        streamer?.name ?? 'Discord',
@@ -173,14 +173,14 @@ function relayGossip (
 }
 
 function relayTlOrStreamerComment (
-  { discordCh, deepLTl, cmt, g, frame }: RelayData
+  { discordCh, bl, deepLTl, cmt, g, frame }: RelayData
 ): Task|undefined {
   const mustPost = cmt.isOwner
-                || (isTl (cmt.body, g) && !isBlacklistedOrUnwanted (cmt, g))
+                || (isTl (cmt.body, g) && !isBlacklistedOrUnwanted (cmt, g, bl))
                 || isStreamer (cmt.id)
-                || (cmt.isMod && g.modMessages && !isBlacklistedOrUnwanted (cmt, g))
+                || (cmt.isMod && g.modMessages && !isBlacklistedOrUnwanted (cmt, g, bl))
 
-  const vauthor = streamers.find (s => s.ytId === cmt.id)
+  const vauthor = streamersMap.get (cmt.id)
   const groups  = vauthor?.groups as string[]|undefined
   const vemoji  = groups?.includes ('Nijisanji') ? emoji.niji : emoji.holo
   const premoji = isTl (cmt.body, g)  ? ':speech_balloon:'
@@ -229,6 +229,7 @@ function isGossip (text: string, stalked: Streamer, frame: DexFrame): boolean {
 interface RelayData {
   discordCh: Snowflake
   deepLTl?:  string
+  bl:        Blacklist
   cmt:       ChatComment
   g:         GuildSettings
   frame:     DexFrame

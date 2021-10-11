@@ -1,7 +1,7 @@
 import { GuildSettings } from '../../core/db/models'
 import { Streamer, streamers, streamersYtIdSet } from '../../core/db/streamers'
 import {YouTubeChannelId} from '../holodex/frames'
-import { ChatComment } from './chatRelayer'
+import { Blacklist, ChatComment } from './chatRelayer'
 
 const tlPatterns: RegExp[] = [
   /[\S]+ tl[:)\]\】\］]/i,                  // stuff like 'rough tl)'
@@ -26,9 +26,9 @@ export function isWanted (cmt: string, g: GuildSettings): boolean {
 }
 
 export function isBlacklistedOrUnwanted (
-  cmt: ChatComment, g: GuildSettings
+  cmt: ChatComment, g: GuildSettings, bl: Blacklist
 ): boolean {
-  return isBlacklisted (cmt.id, g) || isUnwanted (cmt.body, g)
+  return bl.has (cmt.id) || isUnwanted (cmt.body, g)
 }
 
 export function isUnwanted (cmt: string, g: GuildSettings): boolean {
