@@ -164,8 +164,9 @@ function relayCameo (
   const groups  = stalked?.groups as string[]|undefined
   const camEmj  = groups?.includes ('Nijisanji') ? emoji.niji : emoji.holo
   const emj     = isGossip ? emoji.peek : camEmj
+  const mustTl  = deepLTl && g.deepl
   const line1   = `${emj} **${cmt.name}** in **${to}**'s chat: \`${cleaned}\``
-  const line2   = deepLTl ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\`` : ''
+  const line2   = mustTl ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\`` : ''
   const line3   = `\n<https://youtu.be/${frame.id}>`
   return {
     _tag: "SendMessageTask",
