@@ -18,10 +18,10 @@ export default (input: ChatWorkerInput): void => {
     }
     if (msg._tag === 'FrameUpdate') { // TODO: don't mutate input
       if (input.frame.status === 'upcoming' && msg.status === 'live') {
+        wentLive = true
         chat.stop()
       }
       input.frame.status = msg.status
-      wentLive = true
     }
   })
   const chat =
@@ -112,19 +112,21 @@ export async function processComments (
   frame: DexFrame, cmts: ChatComment[]
 ): Promise<Task[]> {
   const tasks = await Promise.all (cmts.flatMap (async cmt => {
+    const isTl_       = cmt.isTl || isTl (cmt.body)
+    const isStreamer_ = cmt.isV || isStreamer (cmt.id)
     const streamer    = streamersMap.get (frame.channel.id)
     const author      = streamersMap.get (cmt.id)
-    const isCameo     = isStreamer (cmt.id) && !cmt.isOwner
-    const mustDeepL   = isStreamer (cmt.id) && !isHoloID (streamer)
+    const isCameo     = isStreamer_ && !cmt.isOwner
+    const mustDeepL   = isStreamer_ && !isHoloID (streamer)
     const deepLTl     = mustDeepL ? await tl (cmt.body) : undefined
     const mustShowTl  = mustDeepL && deepLTl !== cmt.body
-    const maybeGossip = isStreamer (cmt.id) || isTl (cmt.body)
+    const maybeGossip = isStreamer_ || isTl_
     const entries     = allEntries.filter (([{}, {}, f, e]) =>
       [(f === 'cameos' ? author : streamer)?.name, 'all'].includes (e.streamer)
       || f === 'gossip'
     )
 
-    const mustSave = isTl (cmt.body) || isStreamer (cmt.id)
+    const mustSave = isTl_ || isStreamer_
 
     const saveTask: SaveMessageTask = {
       _tag: 'SaveMessageTask',
