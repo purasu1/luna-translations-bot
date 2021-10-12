@@ -73,8 +73,11 @@ function setupLive (frame: DexFrame) {
       const tasks = await processComments (frame, [cmt])
       tasks.forEach (runTask)
     }
-    if (msg.type === 'end') {
+    else if (msg.type === 'end') {
       sendAndForgetHistory (frame.id)
+    }
+    else {
+      debug (msg)
     }
   })
 }
