@@ -42,10 +42,10 @@ export function getRelayNotifyProps (frame: DexFrame): NotifyOptions {
       I will now relay translations from live translators.
       ${frame.title}
       https://youtu.be/${frame.id}
-      (Relay from live frames currently powered by Holodex!)
     `,
     emoji: emoji.holo,
     videoId: frame.id,
-    avatarUrl: frame.channel.photo
+    avatarUrl: frame.channel.photo,
+    credits: true
   }
 }

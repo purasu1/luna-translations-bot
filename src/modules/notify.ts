@@ -31,7 +31,8 @@ export async function notifyOneGuild (
       embeds: [createEmbed ({
         author: { name: streamer!.name, iconURL: opts.avatarUrl },
         thumbnail: { url: opts.avatarUrl },
-        description: embedBody
+        description: embedBody,
+        ...(opts.credits ? { footer: { text: 'Relay from live frames currently powered by Holodex!' } } : {})
       })]
     })
     .then (msg => {
@@ -66,4 +67,5 @@ export interface NotifyOptions {
   avatarUrl:     string
   videoId?:      VideoId
   nonEmbedText?: string
+  credits?:      boolean
 }

@@ -56,6 +56,7 @@ const tldex = io ('wss://holodex.net', {
 tldex.on ('connect_error', debug)
 
 function setupLive (frame: DexFrame) {
+  debug (`setting up ${frame.status} ${frame.id} ${frame.title}`)
   tldex.emit ('subscribe', { video_id: frame.id, lang: 'en' })
   tldex.on (`${frame.id}/en`, async msg => {
     if (msg.channel_id) {
