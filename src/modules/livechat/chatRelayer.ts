@@ -79,7 +79,7 @@ function setupLive (frame: DexFrame) {
   })
   tldex.onAny ((evtName, ...args) => {
     if (!evtName.includes ('/en') && evtName !== 'subscribeSuccess') {
-      debug (JSON.stringify (args))
+      debug (evtName + ' ' + JSON.stringify (args))
     }
   })
 }
