@@ -55,6 +55,13 @@ export const indies = [
     groups: ['indies', 'parents'], twitter: 'amsrntk3',
     aliases: ['nachoneko']
   },
+  {
+    name: 'Naraka', ytId: 'UC-o-E6I3IC2q8sAoAuM6Umg',
+    chName: 'Naraka',
+    picture: '',
+    groups: ['indies'], twitter: '',
+    aliases: []
+  },
   // {
     // name: 'tam', ytId: 'UCVTRz4yxAm0m3jo_4tpEcZw',
     // chName: 'タム',
