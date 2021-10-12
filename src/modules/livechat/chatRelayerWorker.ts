@@ -11,12 +11,17 @@ import { AddChatItemAction, runsToString, MasterchatError, Masterchat } from 'ma
 
 export default (input: ChatWorkerInput): void => {
   allEntries = input.allEntries
+  let wentLive = false
   input.port.on ('message', (msg: any) => { // TODO: refine any
     if (msg._tag === 'EntryUpdate') {
       allEntries = msg.entries
     }
     if (msg._tag === 'FrameUpdate') { // TODO: don't mutate input
+      if (input.frame.status === 'upcoming' && msg.status === 'live') {
+        chat.stop()
+      }
       input.frame.status = msg.status
+      wentLive = true
     }
   })
   const chat =
@@ -33,9 +38,11 @@ export default (input: ChatWorkerInput): void => {
     errorCode: err instanceof MasterchatError ? err.code : undefined
   }))
 
-  chat.on ('end', () => input.port.postMessage ({
-    _tag: 'EndTask', frame: input.frame
-  }))
+  chat.on ('end', () => {
+    input.port.postMessage ({
+      _tag: 'EndTask', frame: input.frame, wentLive
+    })
+  })
 
   chat.listen ({ ignoreFirstResponse: true })
 }
@@ -76,9 +83,14 @@ interface EndTask {
   _tag: 'EndTask'
   frame: DexFrame
   errorCode?: string
+  wentLive?: boolean
 }
 
-export type Task = SendMessageTask | SaveMessageTask | LogCommentTask | EndTask
+export type Task
+  = SendMessageTask
+  | SaveMessageTask
+  | LogCommentTask
+  | EndTask
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -96,7 +108,7 @@ function toChatComments (chats: AddChatItemAction[]): ChatComment[] {
   }))
 }
 
-async function processComments (
+export async function processComments (
   frame: DexFrame, cmts: ChatComment[]
 ): Promise<Task[]> {
   const tasks = await Promise.all (cmts.flatMap (async cmt => {

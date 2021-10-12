@@ -9,9 +9,10 @@ import { logCommentData } from './logging'
 import { frameEmitter } from '../holodex/frameEmitter'
 import { isMainThread, MessageChannel } from 'worker_threads'
 import { resolve } from 'path'
-import { Task } from './chatRelayerWorker'
+import { processComments, Task } from './chatRelayerWorker'
 import {client} from '../../core'
-import {log} from '../../helpers'
+import { io } from 'socket.io-client'
+import {debug, log} from '../../helpers'
 const Piscina = require ('piscina')
 
 const piscina = new Piscina ({
@@ -21,7 +22,10 @@ const piscina = new Piscina ({
 })
 
 if (isMainThread) frameEmitter.on ('frame', (frame: DexFrame) => {
-  if (isPublic (frame)) setupRelay (frame)
+  if (isPublic (frame)) {
+    setupRelay (frame)
+    if (frame.status === 'live') setupLive (frame)
+  }
 })
 
 const masterchats: Record<VideoId, any> = {} // Figure out why MessagePort type broken
@@ -44,6 +48,33 @@ export async function setupRelay (frame: DexFrame): Promise<void> {
   port2.on ('message', runTask)
 }
 
+// TODO: ensure no race condition getting live frames on startup
+const tldex = io ('wss://holodex.net', {
+  path: '/api/socket.io/', transports: ['websocket']
+})
+
+tldex.on ('connect_error', debug)
+
+function setupLive (frame: DexFrame) {
+  tldex.emit ('subscribe', { video_id: frame.id, lang: 'en' })
+  tldex.on (`${frame.id}/en`, async msg => {
+    if (msg.channel_id) {
+      const cmt: ChatComment = {
+        id: msg.channel_id,
+        name: msg.name,
+        body: msg.message,
+        time: msg.timestamp,
+        isMod: msg.is_moderator,
+        isOwner: msg.is_owner,
+        isTl: msg.is_tl,
+        isV: msg.is_vtuber
+      }
+      const tasks = await processComments (frame, [cmt])
+      tasks.forEach (runTask)
+    }
+  })
+}
+
 export interface ChatComment {
   id:      string
   name:    string
@@ -51,6 +82,8 @@ export interface ChatComment {
   time:    number
   isMod:   boolean
   isOwner: boolean
+  isTl?:   boolean
+  isV?:    boolean
 }
 
 export type Entry = [GuildSettings, Blacklist, WatchFeature, WatchFeatureSettings]
@@ -79,7 +112,7 @@ setInterval (() => {
 function runTask (task: Task): void {
   if (task._tag === 'EndTask') {
     delete masterchats[task.frame.id]
-    retryIfStillUpThenPostLog (task.frame, task.errorCode)
+    if (!task.wentLive) retryIfStillUpThenPostLog (task.frame, task.errorCode)
   }
   if (task._tag === 'LogCommentTask') {
     logCommentData (task.cmt, task.frame, task.streamer)
