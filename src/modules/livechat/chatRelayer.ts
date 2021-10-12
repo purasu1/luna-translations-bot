@@ -77,7 +77,7 @@ function setupLive (frame: DexFrame) {
       sendAndForgetHistory (frame.id)
     }
     else {
-      debug (msg)
+      debug (JSON.stringify (msg))
     }
   })
 }
