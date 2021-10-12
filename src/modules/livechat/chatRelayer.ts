@@ -24,8 +24,8 @@ const piscina = new Piscina ({
 
 if (isMainThread) frameEmitter.on ('frame', (frame: DexFrame) => {
   if (isPublic (frame)) {
-    setupRelay (frame)
     if (frame.status === 'live') setupLive (frame)
+    else setupRelay (frame)
   }
 })
 
