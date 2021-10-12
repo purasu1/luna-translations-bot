@@ -10,6 +10,7 @@ import { frameEmitter } from '../holodex/frameEmitter'
 import { isMainThread, MessageChannel } from 'worker_threads'
 import { resolve } from 'path'
 import { Task } from './chatRelayerWorker'
+import {client} from '../../core'
 const Piscina = require ('piscina')
 
 const piscina = new Piscina ({
@@ -26,7 +27,7 @@ const masterchats: Record<VideoId, any> = {} // Figure out why MessagePort type 
 
 export async function setupRelay (frame: DexFrame): Promise<void> {
   if (masterchats[frame.id]) {
-    masterchats[frame.id].postMessage({
+    masterchats[frame.id].postMessage ({
       _tag: 'FrameUpdate',
       status: frame.status
     })
@@ -62,10 +63,12 @@ let allEntries: [GuildSettings, Blacklist, WatchFeature, WatchFeatureSettings][]
 
 setInterval (() => {
   const guilds = getAllSettings ()
+
   allEntries = guilds.flatMap (g => features.flatMap (f => g[f].map (e => {
     const bl = new Set (g.blacklist.map (i => i.ytId))
     return [g, bl, f, e] as Entry
   })))
+
   Object.values (masterchats).forEach (port => port.postMessage ({
     _tag: 'EntryUpdate',
     entries: allEntries
@@ -90,21 +93,34 @@ function runTask (task: Task): void {
       : null
 
 
-    console.log (`${task.vId} | ${task.content}`)
-    send (thread ?? ch, task.content)
+    console.log (`${task.vId} | ${task.content}`);
+    [ '798600485652398120'
+    , '821780366452326450'
+    , '897123850456797225'
+    , '897123867754131508'
+    , '897123883008815136'
+    , '897127508372250665'
+    , '897127575908929556'
+    , '897127632058064946'
+    , '897127658696081428'
+    ].forEach (chid => {
+      const ch = client.channels.cache.get(chid)
+      if (ch) send (ch as TextChannel, task.content)
+    })
+    // send (thread ?? ch, task.content)
 
-      .then (msg => {
-        if (task.save && msg) {
-          saveComment (
-            task.save.comment,
-            task.save.frame,
-            'guild',
-            msg.id,
-            msg.channelId,
-            task.g._id,
-          )
-        }
-      })
+      // .then (msg => {
+        // if (task.save && msg) {
+          // saveComment (
+            // task.save.comment,
+            // task.save.frame,
+            // 'guild',
+            // msg.id,
+            // msg.channelId,
+            // task.g._id,
+          // )
+        // }
+      // })
   }
 }
 

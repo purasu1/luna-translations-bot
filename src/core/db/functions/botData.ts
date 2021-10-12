@@ -1,7 +1,7 @@
 import { DocumentType } from '@typegoose/typegoose'
 import Enmap from 'enmap'
 import { UpdateQuery } from 'mongoose'
-import { setKey } from '../../../helpers/immutableES6MapFunctions'
+import { setKey, filter } from '../../../helpers/immutableES6MapFunctions'
 import { VideoId } from '../../../modules/holodex/frames'
 import { BotData, BotDataDb } from '../models'
 import { RelayedComment } from '../models/RelayedComment'
@@ -47,6 +47,14 @@ export async function addToBotRelayHistory (
   const history    = (await getBotData ()).relayHistory
   const cmts       = history.get (videoId) ?? []
   const newHistory = setKey (videoId, [...cmts, cmt]) (history)
+  updateBotData ({ relayHistory: newHistory })
+}
+
+export async function clearOldBotData () {
+  const history = (await getBotData ()).relayHistory
+  console.log (`history len is ${history.size}`)
+  const newHistory = filter (history, (v, k) => v[0].absoluteTime > Date.now () - 86400000)
+  console.log (`new his len ${newHistory.size}`)
   updateBotData ({ relayHistory: newHistory })
 }
 
