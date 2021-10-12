@@ -1,7 +1,7 @@
 import { client } from '../'
 import { config } from '../../config'
 import { log } from '../../helpers'
-import {clearOldData} from '../db/functions'
+import {clearOldData, clearOldBotData} from '../db/functions'
 import { isMainThread } from 'worker_threads'
 
 export async function ready () {
@@ -14,5 +14,7 @@ export async function ready () {
     import ('../../modules/livechat/chatRelayer')
 
     setInterval (clearOldData, 24*60*60*100)
+    clearOldData()
+    clearOldBotData()
   }
 }
