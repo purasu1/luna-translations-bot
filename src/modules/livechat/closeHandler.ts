@@ -37,7 +37,7 @@ export async function retryIfStillUpThenPostLog (
 
 const retries: Record<VideoId, [number, string]> = {}
 
-async function sendAndForgetHistory (videoId: VideoId): Promise<void> {
+export async function sendAndForgetHistory (videoId: VideoId): Promise<void> {
   const relevantHistories = getAllRelayHistories ()
     .map (history => history.get (videoId))
     .filter (isNotNil)

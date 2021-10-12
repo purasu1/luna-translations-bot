@@ -4,7 +4,7 @@ import { findTextChannel, send } from '../../helpers/discord'
 import { Snowflake, TextChannel, ThreadChannel } from 'discord.js'
 import { addToGuildRelayHistory, getGuildData, getAllSettings, addToBotRelayHistory } from '../../core/db/functions'
 import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db/models'
-import { retryIfStillUpThenPostLog } from './closeHandler'
+import { retryIfStillUpThenPostLog, sendAndForgetHistory } from './closeHandler'
 import { logCommentData } from './logging'
 import { frameEmitter } from '../holodex/frameEmitter'
 import { isMainThread, MessageChannel } from 'worker_threads'
@@ -72,6 +72,9 @@ function setupLive (frame: DexFrame) {
       }
       const tasks = await processComments (frame, [cmt])
       tasks.forEach (runTask)
+    }
+    if (msg.type === 'end') {
+      sendAndForgetHistory (frame.id)
     }
   })
 }
