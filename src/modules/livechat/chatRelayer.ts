@@ -55,6 +55,12 @@ const tldex = io ('wss://holodex.net', {
 })
 
 tldex.on ('connect_error', compose (debug, JSON.stringify))
+tldex.on ('subscribeSuccess', msg => console.log ("subsucc " + JSON.stringify (msg)))
+tldex.onAny ((evtName, ...args) => {
+  if (!evtName.includes ('/en') && evtName !== 'subscribeSuccess') {
+    debug (evtName + ' ' + JSON.stringify (args))
+  }
+})
 
 function setupLive (frame: DexFrame) {
   debug (`setting up ${frame.status} ${frame.id} ${frame.title}`)
@@ -76,12 +82,6 @@ function setupLive (frame: DexFrame) {
     }
     else if (msg.type === 'end') {
       sendAndForgetHistory (frame.id)
-    }
-  })
-  tldex.on ('subscribeSuccess', msg => console.log ("subsucc " + JSON.stringify (msg)))
-  tldex.onAny ((evtName, ...args) => {
-    if (!evtName.includes ('/en') && evtName !== 'subscribeSuccess') {
-      debug (evtName + ' ' + JSON.stringify (args))
     }
   })
 }
