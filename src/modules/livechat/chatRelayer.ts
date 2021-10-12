@@ -77,6 +77,7 @@ function setupLive (frame: DexFrame) {
       sendAndForgetHistory (frame.id)
     }
   })
+  tldex.on ('subscribeSuccess', debug)
   tldex.onAny ((evtName, ...args) => {
     if (!evtName.includes ('/en') && evtName !== 'subscribeSuccess') {
       debug (evtName + ' ' + JSON.stringify (args))
