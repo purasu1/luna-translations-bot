@@ -13,6 +13,7 @@ import { processComments, Task } from './chatRelayerWorker'
 import {client} from '../../core'
 import { io } from 'socket.io-client'
 import {debug, log} from '../../helpers'
+import {compose} from 'ramda'
 const Piscina = require ('piscina')
 
 const piscina = new Piscina ({
@@ -53,7 +54,7 @@ const tldex = io ('wss://holodex.net', {
   path: '/api/socket.io/', transports: ['websocket']
 })
 
-tldex.on ('connect_error', debug)
+tldex.on ('connect_error', compose (debug, JSON.stringify))
 
 function setupLive (frame: DexFrame) {
   debug (`setting up ${frame.status} ${frame.id} ${frame.title}`)
