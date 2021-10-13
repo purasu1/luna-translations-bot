@@ -96,7 +96,7 @@ function setupLive (frame: DexFrame) {
         isV: msg.is_vtuber
       }
       const tasks = await processComments (frame, [cmt], allEntries)
-      console.log(JSON.stringify (tasks))
+      console.log(tasks.filter(t => t._tag === 'SendMessageTask').map((t: any) => `[${t.vId} | ${t.cid} | ${t.content}]`))
       tasks.forEach (runTask)
     }
     else if (msg.type === 'end') {
