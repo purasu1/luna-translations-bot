@@ -29,6 +29,7 @@ export default (input: ChatWorkerInput): void => {
 
   chat.on ('chats', async chats => {
     const cmtTasks = await processComments (input.frame, toChatComments (chats))
+    console.log('worker tasks: '+cmtTasks.filter(t => t._tag === 'SendMessageTask').map((t: any) => `[${t.vId} | ${t.cid} | ${t.content}]`))
     cmtTasks.forEach (task => input.port.postMessage (task))
   })
 
