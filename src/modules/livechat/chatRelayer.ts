@@ -63,13 +63,13 @@ tldex.on ('subscribeSuccess', msg => {
   console.log ("subsucc " + JSON.stringify (msg))
 })
 tldex.on ('subscribeError', msg => {
-    retries[msg.id] = (retries[msg.id] ?? 0) + 1
-    if (retries[msg.id] > 20) {
-      setTimeout (() => setupLive (frames[msg.id]), 30000)
-    }
-    else {
-      delete retries[msg.id]
-    }
+  retries[msg.id] = (retries[msg.id] ?? 0) + 1
+  if (retries[msg.id] < 20) {
+    setTimeout (() => setupLive (frames[msg.id]), 30000)
+  }
+  else {
+    delete retries[msg.id]
+  }
 })
 tldex.onAny ((evtName, ...args) => {
   // if (!evtName.includes ('/en') && evtName !== 'subscribeSuccess') {
