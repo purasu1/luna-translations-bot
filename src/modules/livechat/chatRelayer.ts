@@ -95,7 +95,7 @@ function setupLive (frame: DexFrame) {
         isTl: msg.is_tl,
         isV: msg.is_vtuber
       }
-      const tasks = await processComments (frame, [cmt])
+      const tasks = await processComments (frame, [cmt], allEntries)
       tasks.forEach (runTask)
     }
     else if (msg.type === 'end') {

@@ -109,7 +109,7 @@ function toChatComments (chats: AddChatItemAction[]): ChatComment[] {
 }
 
 export async function processComments (
-  frame: DexFrame, cmts: ChatComment[]
+  frame: DexFrame, cmts: ChatComment[], entrs?: Entries
 ): Promise<Task[]> {
   const tasks = await Promise.all (cmts.flatMap (async cmt => {
     const isTl_       = cmt.isTl || isTl (cmt.body)
@@ -121,7 +121,7 @@ export async function processComments (
     const deepLTl     = mustDeepL ? await tl (cmt.body) : undefined
     const mustShowTl  = mustDeepL && deepLTl !== cmt.body
     const maybeGossip = isStreamer_ || isTl_
-    const entries     = allEntries.filter (([{}, {}, f, e]) =>
+    const entries     = (entrs ?? allEntries).filter (([{}, {}, f, e]) =>
       [(f === 'cameos' ? author : streamer)?.name, 'all'].includes (e.streamer)
       || f === 'gossip'
     )
