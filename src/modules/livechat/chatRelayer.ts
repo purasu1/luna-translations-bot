@@ -27,21 +27,13 @@ if (isMainThread) frameEmitter.on ('frame', (frame: DexFrame) => {
     if (frame.status === 'live') {
       setupLive (frame)
     }
-    setupRelay (frame)
+    else setupRelay (frame)
   }
 })
 
 const masterchats: Record<VideoId, any> = {} // Figure out why MessagePort type broken
 
 export async function setupRelay (frame: DexFrame): Promise<void> {
-  if (masterchats[frame.id]) {
-    masterchats[frame.id].postMessage ({
-      _tag: 'FrameUpdate',
-      status: frame.status
-    })
-    return
-  }
-  
   const { port1, port2 } = new MessageChannel ()
 
   masterchats[frame.id] = port2
@@ -60,6 +52,14 @@ const tldex = io ('wss://holodex.net', {
 tldex.on ('connect_error', compose (debug, JSON.stringify))
 tldex.on ('subscribeSuccess', msg => {
   delete frames[msg.id]
+  if (masterchats[msg.id]) {
+    masterchats[msg.id].postMessage ({
+      _tag: 'FrameUpdate',
+      status: msg.status
+    })
+    return
+  }
+  
   console.log ("subsucc " + JSON.stringify (msg))
 })
 tldex.on ('subscribeError', msg => {
