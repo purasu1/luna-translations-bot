@@ -88,7 +88,7 @@ function setupLive (frame: DexFrame) {
       const cmt: ChatComment = {
         id: msg.channel_id,
         name: msg.name,
-        body: msg.message,
+        body: msg.message.replace (/:http\S+( |$)/g, ':'),
         time: msg.timestamp,
         isMod: msg.is_moderator,
         isOwner: msg.is_owner,
