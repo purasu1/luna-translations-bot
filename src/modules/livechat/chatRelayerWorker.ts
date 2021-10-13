@@ -125,6 +125,7 @@ export async function processComments (
       [(f === 'cameos' ? author : streamer)?.name, 'all'].includes (e.streamer)
       || f === 'gossip'
     )
+    console.log(`entries are ${JSON.stringify (entries)}`)
 
     const mustSave = isTl_ || isStreamer_
 
