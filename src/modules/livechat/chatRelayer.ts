@@ -24,8 +24,10 @@ const piscina = new Piscina ({
 
 if (isMainThread) frameEmitter.on ('frame', (frame: DexFrame) => {
   if (isPublic (frame)) {
-    if (frame.status === 'live') setupLive (frame)
-    else setupRelay (frame)
+    if (frame.status === 'live') {
+      setupLive (frame)
+    }
+    setupRelay (frame)
   }
 })
 
@@ -50,19 +52,38 @@ export async function setupRelay (frame: DexFrame): Promise<void> {
 }
 
 // TODO: ensure no race condition getting live frames on startup
-const tldex = io ('wss://holodex.net', {
-  path: '/api/socket.io/', transports: ['websocket']
-})
+// const tldex = io ('wss://holodex.net', {
+  // path: '/api/socket.io/', transports: ['websocket']
+// })
 
-tldex.on ('connect_error', compose (debug, JSON.stringify))
-tldex.on ('subscribeSuccess', msg => console.log ("subsucc " + JSON.stringify (msg)))
-tldex.onAny ((evtName, ...args) => {
-  if (!evtName.includes ('/en') && evtName !== 'subscribeSuccess') {
-    debug (evtName + ' ' + JSON.stringify (args))
-  }
-})
+// tldex.on ('connect_error', compose (debug, JSON.stringify))
+// tldex.on ('subscribeSuccess', msg => console.log ("subsucc " + JSON.stringify (msg)))
+// tldex.onAny ((evtName, ...args) => {
+  // if (!evtName.includes ('/en') && evtName !== 'subscribeSuccess') {
+    // debug (evtName + ' ' + JSON.stringify (args))
+  // }
+// })
 
+const retries: Record<VideoId, number> = {}
 function setupLive (frame: DexFrame) {
+  const tldex = io ('wss://holodex.net', {
+    path: '/api/socket.io/', transports: ['websocket']
+  })
+  tldex.on ('connect_error', () => {
+    retries[frame.id] = (retries[frame.id] ?? 0) + 1
+    if (retries[frame.id] > 20) {
+      setTimeout (() => setupLive (frame), 30000)
+    }
+    else {
+      delete retries[frame.id]
+    }
+  })
+  tldex.on ('subscribeSuccess', msg => console.log ("subsucc " + JSON.stringify (msg)))
+  tldex.onAny ((evtName, ...args) => {
+    if (!evtName.includes ('/en') && evtName !== 'subscribeSuccess') {
+      debug (evtName + ' ' + JSON.stringify (args))
+    }
+  })
   debug (`setting up ${frame.status} ${frame.id} ${frame.title}`)
   tldex.emit ('subscribe', { video_id: frame.id, lang: 'en' })
   tldex.on (`${frame.id}/en`, async msg => {
