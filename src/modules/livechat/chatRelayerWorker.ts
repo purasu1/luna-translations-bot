@@ -24,6 +24,7 @@ export default (input: ChatWorkerInput): void => {
       input.frame.status = msg.status
     }
   })
+  if (input.frame.status === 'live') return
   const chat =
     new Masterchat (input.frame.id, input.frame.channel.id, { mode: 'live' })
 
