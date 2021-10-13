@@ -83,7 +83,7 @@ function setupLive (frame: DexFrame) {
   frames[frame.id] = frame
   tldex.emit ('subscribe', { video_id: frame.id, lang: 'en' })
   tldex.on (`${frame.id}/en`, async msg => {
-    debug (`Received a message in ${frame.id}`)
+    debug (`Received a message in ${frame.id}: ${JSON.stringify (msg)}`)
     if (msg.channel_id) {
       const cmt: ChatComment = {
         id: msg.channel_id,
