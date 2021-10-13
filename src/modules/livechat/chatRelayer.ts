@@ -82,6 +82,7 @@ function setupLive (frame: DexFrame) {
   debug (`setting up ${frame.status} ${frame.id} ${frame.title}`)
   frames[frame.id] = frame
   tldex.emit ('subscribe', { video_id: frame.id, lang: 'en' })
+  ;(tldex as any).removeAllListeners?.(`${frame.id}/en`)
   tldex.on (`${frame.id}/en`, async msg => {
     debug (`Received a message in ${frame.id}: ${JSON.stringify (msg)}`)
     if (msg.channel_id) {
