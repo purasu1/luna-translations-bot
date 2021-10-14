@@ -23,7 +23,6 @@ export default (input: ChatWorkerInput): void => {
         input.port.postMessage ({_tag: 'EndTask', frame: input.frame, wentLive})
       }
       input.frame.status = msg.status
-      process.exit ()
     }
   })
   if (input.frame.status === 'live') return
