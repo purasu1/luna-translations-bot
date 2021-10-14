@@ -55,7 +55,7 @@ tldex.on ('subscribeSuccess', msg => {
   if (masterchats[msg.id]) {
     masterchats[msg.id].postMessage ({
       _tag: 'FrameUpdate',
-      status: msg.status
+      status: 'live'
     })
     return
   }

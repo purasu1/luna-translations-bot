@@ -17,11 +17,13 @@ export default (input: ChatWorkerInput): void => {
       allEntries = msg.entries
     }
     if (msg._tag === 'FrameUpdate') { // TODO: don't mutate input
-      if (input.frame.status === 'upcoming' && msg.status === 'live') {
+      if (msg.status === 'live') {
         wentLive = true
         chat.stop()
+        input.port.postMessage ({_tag: 'EndTask', frame: input.frame, wentLive})
       }
       input.frame.status = msg.status
+      process.exit ()
     }
   })
   if (input.frame.status === 'live') return
