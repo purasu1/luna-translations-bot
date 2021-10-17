@@ -184,7 +184,7 @@ function relayGossip (
   data: RelayData
 ): SendMessageTask|undefined {
   const stalked = streamers.find (s => s.name === data.e.streamer)
-  return (isGossip (data.cmt.body, stalked!, data.frame))
+  return stalked && (isGossip (data.cmt.body, stalked, data.frame))
     ? relayCameo (data, true)
     : undefined
 }
