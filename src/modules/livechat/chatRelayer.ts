@@ -44,14 +44,23 @@ export async function setupRelay (frame: DexFrame): Promise<void> {
 }
 
 // TODO: ensure no race condition getting live frames on startup
-const frames: Record<VideoId, DexFrame> = {}
+const framesAwaitingSub: Record<VideoId, DexFrame> = {}
+const activeSubs: Set<VideoId> = new Set ()
+
 const tldex = io ('wss://holodex.net', {
   path: '/api/socket.io/', transports: ['websocket']
 })
 
 tldex.on ('connect_error', compose (debug, JSON.stringify))
+// resubscribe on server restart
+tldex.on ('connect', () => {
+  activeSubs.forEach (sub => {
+    tldex.emit ('subscribe', { video_id: sub, lang: 'en' })
+  })
+})
 tldex.on ('subscribeSuccess', msg => {
-  delete frames[msg.id]
+  delete framesAwaitingSub[msg.id]
+  activeSubs.add (msg.id)
   if (masterchats[msg.id]) {
     masterchats[msg.id].postMessage ({
       _tag: 'FrameUpdate',
@@ -65,7 +74,7 @@ tldex.on ('subscribeSuccess', msg => {
 tldex.on ('subscribeError', msg => {
   retries[msg.id] = (retries[msg.id] ?? 0) + 1
   if (retries[msg.id] < 20) {
-    setTimeout (() => setupLive (frames[msg.id]), 30000)
+    setTimeout (() => setupLive (framesAwaitingSub[msg.id]), 30000)
   }
   else {
     delete retries[msg.id]
@@ -80,7 +89,7 @@ tldex.onAny ((evtName, ...args) => {
 const retries: Record<VideoId, number> = {}
 function setupLive (frame: DexFrame) {
   debug (`setting up ${frame.status} ${frame.id} ${frame.title}`)
-  frames[frame.id] = frame
+  framesAwaitingSub[frame.id] = frame
   tldex.emit ('subscribe', { video_id: frame.id, lang: 'en' })
   ;(tldex as any).removeAllListeners?.(`${frame.id}/en`)
   tldex.on (`${frame.id}/en`, async msg => {
@@ -100,6 +109,7 @@ function setupLive (frame: DexFrame) {
       tasks.forEach (runTask)
     }
     else if (msg.type === 'end') {
+      activeSubs.delete (frame.id)
       sendAndForgetHistory (frame.id)
     }
   })
