@@ -228,7 +228,7 @@ export const hololive = [
     chName: "Rushia Ch. 潤羽るしあ",
     picture: 'https://yt3.ggpht.com/ytc/AAUvwngKVHYXNDzaEG9KIXm9lK0nBxHkA-NxlE88dLtl=s800-c-k-c0x00ffffff-no-rj',
     groups: ['3rd Generation'], twitter: 'uruharushia',
-    aliases: ['rushia', 'るしあ']
+    aliases: ['rushia', 'るしあ', 'るーちゃん', 'るしゃ', 'ルシファア', 'ルシファー', 'ru-chan', 'ruchan', 'rushifer', 'rusha']
   },
   {
     name: 'Mori Calliope', ytId: 'UCL_qhgtOy0dy1Agp8vkySQg',

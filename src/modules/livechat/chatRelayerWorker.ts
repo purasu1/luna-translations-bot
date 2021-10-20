@@ -1,4 +1,4 @@
-import { ciEquals, doNothing, match } from '../../helpers'
+import { ciEquals, doNothing, isJp, match } from '../../helpers'
 import { DexFrame } from '../holodex/frames'
 import { Streamer, StreamerName, streamers, streamersMap } from '../../core/db/streamers'
 import { emoji } from '../../helpers/discord'
@@ -239,7 +239,8 @@ function isGossip (text: string, stalked: Streamer, frame: DexFrame): boolean {
     .replace(/[,()]|'s/g, '')
     .split (' ')
     .some (w => stalked.aliases.some (a => ciEquals (a, w)))
-  
+    || stalked.aliases.some (a => isJp (a) && text.includes (a))
+
   return !isOwnChannel && !isCollab && mentionsWatched
 }
 
