@@ -237,6 +237,7 @@ function isGossip (text: string, stalked: Streamer, frame: DexFrame): boolean {
       .some (str => frame.description.includes (str))
   const mentionsWatched = text
     .replace(/[,()]|'s/g, '')
+    .replaceAll('-', ' ')
     .split (' ')
     .some (w => stalked.aliases.some (a => ciEquals (a, w)))
     || stalked.aliases.some (a => isJp (a) && text.includes (a))
