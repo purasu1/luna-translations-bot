@@ -69,6 +69,13 @@ export const indies = [
     groups: ['indies', 'parents'], twitter: 'nana_kaguraaa',
     aliases: ['nana', 'なな', 'ナナ']
   },
+  {
+    name: 'Shigure Ui', ytId: 'UCt30jJgChL8qeT9VPadidSw',
+    chName: 'しぐれうい',
+    picture: '',
+    groups: ['indies', 'parents'], twitter: 'ui_shig',
+    aliases: ['ui', 'uimama', 'ういママ']
+  }
   // {
     // name: 'tam', ytId: 'UCVTRz4yxAm0m3jo_4tpEcZw',
     // chName: 'タム',
