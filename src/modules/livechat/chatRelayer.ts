@@ -209,7 +209,7 @@ function runTask (task: Task): void {
                     task.g._id,
                   )
                 }
-              })}
+              })
           })
       })
     } else {
