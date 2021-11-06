@@ -184,7 +184,7 @@ function relayGossip (
   data: RelayData
 ): SendMessageTask|undefined {
   const stalked = streamers.find (s => s.name === data.e.streamer)
-  return stalked && (isGossip (data.cmt.body, stalked, data.frame))
+  return stalked && (isGossip (data.cmt, stalked, data.frame))
     ? relayCameo (data, true)
     : undefined
 }
@@ -230,18 +230,19 @@ function relayTlOrStreamerComment (
     : undefined
 }
 
-function isGossip (text: string, stalked: Streamer, frame: DexFrame): boolean {
+function isGossip (cmt: ChatComment, stalked: Streamer, frame: DexFrame): boolean {
   const isOwnChannel = frame.channel.id === stalked.ytId
   const isCollab =
     [stalked.twitter, stalked.ytId, stalked.name, stalked.chName]
       .some (str => frame.description.includes (str))
-  const mentionsWatched = text
+  const mentionsWatched = cmt.body
     .replace(/[,()]|'s/g, '')
+    .replaceAll('-', ' ')
     .split (' ')
     .some (w => stalked.aliases.some (a => ciEquals (a, w)))
-    || stalked.aliases.some (a => isJp (a) && text.includes (a))
+    || stalked.aliases.some (a => isJp (a) && cmt.body.includes (a))
 
-  return !isOwnChannel && !isCollab && mentionsWatched
+  return !isOwnChannel && !isCollab && mentionsWatched && cmt.id !== stalked.ytId
 }
 
 interface RelayData {

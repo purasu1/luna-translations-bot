@@ -62,6 +62,20 @@ export const indies = [
     groups: ['indies'], twitter: '',
     aliases: []
   },
+  {
+    name: 'Kagura Nana', ytId: 'UCbfv8uuUXt3RSJGEwxny5Rw',
+    chName: 'カグラナナchannel／ななかぐら',
+    picture: 'https://yt3.ggpht.com/ytc/AKedOLRXNReo3pYY2AV7kE7gKUM-2W-ZfV20upW5yK2shA=s88-c-k-c0x00ffffff-no-rj',
+    groups: ['indies', 'parents'], twitter: 'nana_kaguraaa',
+    aliases: ['nana', 'なな', 'ナナ']
+  },
+  {
+    name: 'Shigure Ui', ytId: 'UCt30jJgChL8qeT9VPadidSw',
+    chName: 'しぐれうい',
+    picture: '',
+    groups: ['indies', 'parents'], twitter: 'ui_shig',
+    aliases: ['ui', 'uimama', 'ういママ']
+  }
   // {
     // name: 'tam', ytId: 'UCVTRz4yxAm0m3jo_4tpEcZw',
     // chName: 'タム',
