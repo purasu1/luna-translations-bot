@@ -180,6 +180,7 @@ function runTask (task: Task): void {
     log (`${task.vId} | ${task.content}`)
     const lastMsg = ch?.lastMessage
     const isBotLastPoster = lastMsg?.author?.id === client.user?.id
+    // this code is ugly and duplicated but im in a hurry
     if (isBotLastPoster) {
       tryOrLog (() => {
         lastMsg?.edit(`${lastMsg.content}\n${task.content}`)
@@ -194,6 +195,21 @@ function runTask (task: Task): void {
                 task.g._id,
               )
             }
+          })
+          .catch (() => {
+            send (thread ?? ch, task.content)
+              .then (msg => {
+                if (task.save && msg) {
+                  saveComment (
+                    task.save.comment,
+                    task.save.frame,
+                    'guild',
+                    msg.id,
+                    msg.channelId,
+                    task.g._id,
+                  )
+                }
+              })}
           })
       })
     } else {
