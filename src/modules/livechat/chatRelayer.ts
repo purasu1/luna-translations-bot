@@ -1,8 +1,8 @@
-import { tryOrDefault } from '../../helpers/tryCatch'
+import { tryOrDefault, tryOrLog } from '../../helpers/tryCatch'
 import { DexFrame, isPublic, VideoId, YouTubeChannelId } from '../holodex/frames'
 import { findTextChannel, send } from '../../helpers/discord'
 import { Snowflake, TextChannel, ThreadChannel } from 'discord.js'
-import { addToGuildRelayHistory, getGuildData, getAllSettings, addToBotRelayHistory } from '../../core/db/functions'
+import { addToGuildRelayHistory, getGuildData, getAllSettings, addToBotRelayHistory, getGuildRelayHistory } from '../../core/db/functions'
 import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db/models'
 import { retryIfStillUpThenPostLog, sendAndForgetHistory } from './closeHandler'
 import { logCommentData } from './logging'
@@ -13,7 +13,7 @@ import { processComments, Task } from './chatRelayerWorker'
 import {client} from '../../core'
 import { io } from 'socket.io-client'
 import {debug, log} from '../../helpers'
-import {compose} from 'ramda'
+import {compose, last} from 'ramda'
 const Piscina = require ('piscina')
 
 const piscina = new Piscina ({
@@ -135,19 +135,30 @@ export type Blacklist = Set<YouTubeChannelId>
 const features: WatchFeature[] = ['relay', 'cameos', 'gossip']
 let allEntries: [GuildSettings, Blacklist, WatchFeature, WatchFeatureSettings][] = []
 
-setInterval (() => {
+async function updateEntries () {
   const guilds = getAllSettings ()
-
+  const foo = await client.guilds.fetch()
   allEntries = guilds.flatMap (g => features.flatMap (f => g[f].map (e => {
     const bl = new Set (g.blacklist.map (i => i.ytId))
     return [g, bl, f, e] as Entry
   })))
+  .filter (entry => {
+    const guild = client.guilds.cache.get(entry[0]._id)
+    const count = guild?.memberCount
+
+    return (count ?? 0) > 1000
+  })
+
 
   Object.values (masterchats).forEach (port => port.postMessage ({
     _tag: 'EntryUpdate',
     entries: allEntries
   }))
-}, 5000)
+}
+
+setInterval (updateEntries, 10000)
+
+updateEntries ()
 
 function runTask (task: Task): void {
   if (task._tag === 'EndTask') {
@@ -167,19 +178,39 @@ function runTask (task: Task): void {
       : null
 
     log (`${task.vId} | ${task.content}`)
-    send (thread ?? ch, task.content)
-      .then (msg => {
-        if (task.save && msg) {
-          saveComment (
-            task.save.comment,
-            task.save.frame,
-            'guild',
-            msg.id,
-            msg.channelId,
-            task.g._id,
-          )
-        }
-      })}
+    const lastMsg = ch?.lastMessage
+    const isBotLastPoster = lastMsg?.author?.id === client.user?.id
+    if (isBotLastPoster) {
+      tryOrLog (() => {
+        lastMsg?.edit(`${lastMsg.content}\n${task.content}`)
+          .then (msg => {
+            if (task.save && msg) {
+              saveComment (
+                task.save.comment,
+                task.save.frame,
+                'guild',
+                msg.id,
+                msg.channelId,
+                task.g._id,
+              )
+            }
+          })
+      })
+    } else {
+      send (thread ?? ch, task.content)
+        .then (msg => {
+          if (task.save && msg) {
+            saveComment (
+              task.save.comment,
+              task.save.frame,
+              'guild',
+              msg.id,
+              msg.channelId,
+              task.g._id,
+            )
+          }
+        })}
+    }
 }
 
 export function findFrameThread (
