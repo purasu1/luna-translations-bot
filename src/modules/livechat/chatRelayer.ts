@@ -102,7 +102,7 @@ function setupLive (frame: DexFrame) {
         time: msg.timestamp,
         isMod: msg.is_moderator,
         isOwner: msg.is_owner,
-        isTl: msg.is_tl,
+        isTl: msg.is_tl || msg.source === 'MChad',
         isV: msg.is_vtuber
       }
       const tasks = await processComments (frame, [cmt], allEntries)
