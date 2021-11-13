@@ -101,7 +101,7 @@ function setupLive (frame: DexFrame) {
         body: msg.message.replace (/:http\S+( |$)/g, ':'),
         time: msg.timestamp,
         isMod: msg.is_moderator,
-        isOwner: msg.is_owner,
+        isOwner: msg.channel_id === frame.channel.id,
         isTl: msg.is_tl || msg.source === 'MChad',
         isV: msg.is_vtuber
       }
