@@ -14,6 +14,13 @@ export const hololive = [
     aliases: ['haato', 'haachama', 'はあちゃま', 'はあと']
   },
   {
+    name: 'Darkweb Haachama', ytId: 'UCHj_mh57PVMXhAUDphUQDFA',
+    chName: "HAACHAMA DARKWEB CH",
+    picture: 'n/a',
+    groups: ['1st Generation'], twitter: 'akaihaato',
+    aliases: []
+  },
+  {
     name: 'Usada Pekora', ytId: 'UC1DCedRgGHBdm81E1llLhOQ',
     chName: "Pekora Ch. 兎田ぺこら",
     picture: 'https://yt3.ggpht.com/ytc/AAUvwnjvkyPGzOmEXZ34mEFPlwMKTbCDl1ZkQ_HkxY-O5Q=s800-c-k-c0x00ffffff-no-rj',
