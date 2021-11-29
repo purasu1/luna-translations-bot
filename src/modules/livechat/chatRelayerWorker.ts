@@ -209,7 +209,7 @@ function relayTlOrStreamerComment (
             : deepLTl                 ? `\n<https://youtu.be/${frame.id}>`
                                       : ` | <https://youtu.be/${frame.id}>`
 
-  const author = isTl (cmt.body, g) ? `||${cmt.name}:||` : `**${cmt.name}:**`
+  const author = isATl ? `||${cmt.name}:||` : `**${cmt.name}:**`
   const text   = cmt.body.replaceAll ('`', "''")
   const tl     = deepLTl && g.deepl
     ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\``
