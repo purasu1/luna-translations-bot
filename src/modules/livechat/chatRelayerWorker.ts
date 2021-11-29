@@ -193,7 +193,7 @@ function relayTlOrStreamerComment (
   { discordCh, bl, deepLTl, cmt, g, frame }: RelayData
 ): Task|undefined {
   const mustPost = cmt.isOwner
-                || (cmt.isTl || (isTl (cmt.body, g)) && !isBlacklistedOrUnwanted (cmt, g, bl))
+                || ((cmt.isTl || (isTl (cmt.body, g))) && !isBlacklistedOrUnwanted (cmt, g, bl))
                 || isStreamer (cmt.id)
                 || (cmt.isMod && g.modMessages && !isBlacklistedOrUnwanted (cmt, g, bl))
 
