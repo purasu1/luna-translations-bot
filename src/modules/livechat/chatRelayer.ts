@@ -94,7 +94,7 @@ function setupLive (frame: DexFrame) {
   ;(tldex as any).removeAllListeners?.(`${frame.id}/en`)
   tldex.on (`${frame.id}/en`, async msg => {
     debug (`Received a message in ${frame.id}: ${JSON.stringify (msg)}`)
-    if (msg.channel_id) {
+    if (msg.name) {
       const cmt: ChatComment = {
         id: msg.channel_id,
         name: msg.name,
