@@ -192,15 +192,16 @@ function relayGossip (
 function relayTlOrStreamerComment (
   { discordCh, bl, deepLTl, cmt, g, frame }: RelayData
 ): Task|undefined {
+  const isATl    = (cmt.isTl || (isTl (cmt.body, g)))
   const mustPost = cmt.isOwner
-                || ((cmt.isTl || (isTl (cmt.body, g))) && !isBlacklistedOrUnwanted (cmt, g, bl))
+                || (isATl && !isBlacklistedOrUnwanted (cmt, g, bl))
                 || isStreamer (cmt.id)
                 || (cmt.isMod && g.modMessages && !isBlacklistedOrUnwanted (cmt, g, bl))
 
   const vauthor = streamersMap.get (cmt.id)
   const groups  = vauthor?.groups as string[]|undefined
   const vemoji  = groups?.includes ('Nijisanji') ? emoji.niji : emoji.holo
-  const premoji = isTl (cmt.body, g)  ? ':speech_balloon:'
+  const premoji = isATl               ? ':speech_balloon:'
                 : isStreamer (cmt.id) ? vemoji
                                       : ':tools:'
 
