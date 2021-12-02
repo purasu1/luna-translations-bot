@@ -46,5 +46,5 @@ function isFreeChat (frame: DexFrame): boolean {
   const exceptions = ['UCK9V2B22uJYu3N7eR_BT9QA','UC9ruVYPv7yJmV0Rh0NKA-Lw', 'UshZgOv3YDEs-ZnZWDYVwJdmA', 'UCAWSyEs_Io8MtpY3m-zqILA']
   const isException = exceptions.some (ch => ch === frame.channel.id)
   const isFreeChat = ['freechat', 'free chat', 'freeechat', 'フリーチャット'].some (pattern => frame.title.toLowerCase ().includes (pattern))
-  return isFreeChat && !isException
+  return isFreeChat && !isException && frame.status !== 'live'
 }
