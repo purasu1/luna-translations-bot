@@ -96,7 +96,7 @@ function setupLive (frame: DexFrame) {
     debug (`Received a message in ${frame.id}: ${JSON.stringify (msg)}`)
     if (msg.name) {
       const cmt: ChatComment = {
-        id: msg.channel_id,
+        id: msg.channel_id ?? 'MChad-'+msg.name,
         name: msg.name,
         body: msg.message.replace (/:http\S+( |$)/g, ':'),
         time: msg.timestamp,
