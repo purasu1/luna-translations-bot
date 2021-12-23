@@ -226,7 +226,7 @@ function runTask (task: Task): void {
             )
           }
         })
-    // }
+      }
     }
 }
 
