@@ -137,18 +137,10 @@ let allEntries: [GuildSettings, Blacklist, WatchFeature, WatchFeatureSettings][]
 
 async function updateEntries () {
   const guilds = getAllSettings ()
-  const foo = await client.guilds.fetch()
   allEntries = guilds.flatMap (g => features.flatMap (f => g[f].map (e => {
     const bl = new Set (g.blacklist.map (i => i.ytId))
     return [g, bl, f, e] as Entry
   })))
-  // .filter (entry => {
-    // const guild = client.guilds.cache.get(entry[0]._id)
-    // const count = guild?.memberCount
-
-    // return (count ?? 0) > 1000
-  // })
-
 
   Object.values (masterchats).forEach (port => port.postMessage ({
     _tag: 'EntryUpdate',
