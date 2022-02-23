@@ -1,8 +1,7 @@
-import { tryOrDefault, tryOrLog } from '../../helpers/tryCatch'
 import { DexFrame, isPublic, VideoId, YouTubeChannelId } from '../holodex/frames'
 import { findTextChannel, send } from '../../helpers/discord'
 import { Snowflake, TextChannel, ThreadChannel } from 'discord.js'
-import { addToGuildRelayHistory, getGuildData, getAllSettings, addToBotRelayHistory, getGuildRelayHistory } from '../../core/db/functions'
+import { addToGuildRelayHistory, getGuildData, getAllSettings, addToBotRelayHistory } from '../../core/db/functions'
 import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db/models'
 import { retryIfStillUpThenPostLog, sendAndForgetHistory } from './closeHandler'
 import { logCommentData } from './logging'
@@ -10,10 +9,9 @@ import { frameEmitter } from '../holodex/frameEmitter'
 import { isMainThread, MessageChannel } from 'worker_threads'
 import { resolve } from 'path'
 import { processComments, Task } from './chatRelayerWorker'
-import {client} from '../../core'
 import { io } from 'socket.io-client'
-import {debug, log} from '../../helpers'
-import {compose, last} from 'ramda'
+import { debug, log} from '../../helpers'
+import { compose } from 'ramda'
 const Piscina = require ('piscina')
 
 const piscina = new Piscina ({
@@ -51,13 +49,15 @@ const tldex = io ('wss://holodex.net', {
   path: '/api/socket.io/', transports: ['websocket']
 })
 
-tldex.on ('connect_error', compose (debug, JSON.stringify))
+tldex.on ('connect_error', (err) => debug(err))
+
 // resubscribe on server restart
 tldex.on ('connect', () => {
   activeSubs.forEach (sub => {
     tldex.emit ('subscribe', { video_id: sub, lang: 'en' })
   })
 })
+
 tldex.on ('subscribeSuccess', msg => {
   delete framesAwaitingSub[msg.id]
   activeSubs.add (msg.id)
@@ -71,6 +71,7 @@ tldex.on ('subscribeSuccess', msg => {
   
   console.log ("subsucc " + JSON.stringify (msg))
 })
+
 tldex.on ('subscribeError', msg => {
   retries[msg.id] = (retries[msg.id] ?? 0) + 1
   if (retries[msg.id] < 20) {
@@ -80,6 +81,7 @@ tldex.on ('subscribeError', msg => {
     delete retries[msg.id]
   }
 })
+
 tldex.onAny ((evtName, ...args) => {
   // if (!evtName.includes ('/en') && evtName !== 'subscribeSuccess') {
     debug (evtName + ': ' + JSON.stringify (args))

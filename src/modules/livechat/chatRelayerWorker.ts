@@ -5,8 +5,8 @@ import { emoji } from '../../helpers/discord'
 import { Snowflake } from 'discord.js'
 import { tl } from '../deepl'
 import { isBlacklistedOrUnwanted, isHoloID, isStreamer, isTl } from './commentBooleans'
-import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db/models'
-import { ChatComment, Entry, Entries, Blacklist } from './chatRelayer'
+import { GuildSettings, WatchFeatureSettings } from '../../core/db/models'
+import { ChatComment, Entries, Blacklist } from './chatRelayer'
 import { AddChatItemAction, runsToString, MasterchatError, Masterchat } from 'masterchat'
 
 export default (input: ChatWorkerInput): void => {
