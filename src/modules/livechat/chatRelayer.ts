@@ -163,7 +163,9 @@ function runTask (task: Task): void {
     logCommentData (task.cmt, task.frame, task.streamer)
   }
   if (task._tag === 'SaveMessageTask') {
+    log ("Saving data...")
     saveComment (task.comment, task.frame, task.type, task.msgId, task.chId)
+    log ("Done saving data.")
   }
   if (task._tag === 'SendMessageTask') {
     const ch = findTextChannel (task.cid)
