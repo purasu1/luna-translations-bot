@@ -65,3 +65,7 @@ export type Fn = (...args: unknown[]) => unknown
 export function isEven (n: number): boolean {
   return n % 2 === 0
 }
+
+export function isJp (s: string): boolean {
+  return /[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]/.test (s)
+}

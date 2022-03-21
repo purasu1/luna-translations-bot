@@ -20,10 +20,10 @@ export const deepl: Command = {
     toggleSetting ({
       msg, setting: 'deepl',
       enable: `
-        ${emoji.deepl} I will now translate Hololive members' chats with DeepL.
+        ${emoji.deepl} I will now translate Vtubers' messages with DeepL.
       `,
       disable: oneLine`
-        ${emoji.deepl} I will no longer translate Hololive members' chats
+        ${emoji.deepl} I will no longer translate Vtubers' messages
         with DeepL.
       `
     })

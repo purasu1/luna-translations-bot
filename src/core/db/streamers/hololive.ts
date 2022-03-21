@@ -14,6 +14,13 @@ export const hololive = [
     aliases: ['haato', 'haachama', 'はあちゃま', 'はあと']
   },
   {
+    name: 'Darkweb Haachama', ytId: 'UCHj_mh57PVMXhAUDphUQDFA',
+    chName: "HAACHAMA DARKWEB CH",
+    picture: 'n/a',
+    groups: ['1st Generation'], twitter: 'akaihaato',
+    aliases: []
+  },
+  {
     name: 'Usada Pekora', ytId: 'UC1DCedRgGHBdm81E1llLhOQ',
     chName: "Pekora Ch. 兎田ぺこら",
     picture: 'https://yt3.ggpht.com/ytc/AAUvwnjvkyPGzOmEXZ34mEFPlwMKTbCDl1ZkQ_HkxY-O5Q=s800-c-k-c0x00ffffff-no-rj',
@@ -228,7 +235,7 @@ export const hololive = [
     chName: "Rushia Ch. 潤羽るしあ",
     picture: 'https://yt3.ggpht.com/ytc/AAUvwngKVHYXNDzaEG9KIXm9lK0nBxHkA-NxlE88dLtl=s800-c-k-c0x00ffffff-no-rj',
     groups: ['3rd Generation'], twitter: 'uruharushia',
-    aliases: ['rushia', 'るしあ']
+    aliases: ['rushia', 'るしあ', 'るーちゃん', 'るしゃ', 'ルシファア', 'ルシファー', 'ru-chan', 'ruchan', 'rushifer', 'rusha']
   },
   {
     name: 'Mori Calliope', ytId: 'UCL_qhgtOy0dy1Agp8vkySQg',
@@ -432,5 +439,44 @@ export const hololive = [
     picture: 'https://yt3.ggpht.com/0lkccaVapSr1Z3uuXWbnaQxeqRWr9Tcs4R9rLBRSrAsN9gLacpiT2OFWfFKr4NhF97_hqK3eTg=s88-c-k-c0x00ffffff-no-rj',
     groups: ['English 2nd Gen'], twitter: 'ceresfauna',
     aliases: ['fauna']
+  },
+{
+    name: 'Laplus Darkness', ytId: 'UCENwRMx5Yh42zWpzURebzTw',
+    chName: "Laplus ch. ラプラス・ダークネス - holoX -",
+    picture: 'dont put anything here',
+    groups: ['6th Generation'], twitter: 'LaplusDarknesss',
+    aliases: ['Laplus']
+  },
+
+  {
+    name: 'Takane Lui', ytId: 'UCs9_O1tRPMQTHQ-N_L6FU2g',
+    chName: "Lui ch. 鷹嶺ルイ - holoX -",
+    picture: 'dont put anything here',
+    groups: ['6th Generation'], twitter: 'takanelui',
+    aliases: ['Lui']
+  },
+
+  {
+    name: 'Hakui Koyori', ytId: 'UC6eWCld0KwmyHFbAqK3V-Rw',
+    chName: "Koyori ch. 博衣こより - holoX -",
+    picture: 'dont put anything here',
+    groups: ['6th Generation'], twitter: 'hakuikoyori',
+    aliases: ['Koyori']
+  },
+
+  {
+    name: 'Sakamata Chloe', ytId: 'UCIBY1ollUsauvVi4hW4cumw',
+    chName: "Chloe ch. 沙花叉クロヱ - holoX -",
+    picture: 'dont put anything here',
+    groups: ['6th Generation'], twitter: 'sakamatachloe',
+    aliases: ['Chloe']
+  },
+
+  {
+    name: 'Kazama Iroha', ytId: 'UC_vMYWcDjmfdpH6r4TTn1MQ',
+    chName: "Iroha ch. 風真いろは - holoX -",
+    picture: 'dont put anything here',
+    groups: ['6th Generation'], twitter: 'kazamairohach',
+    aliases: ['Iroha']
   },
 ] as const

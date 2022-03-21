@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
 import { isEmpty } from 'ramda'
-import { DexFrame, getFrameList } from './frames'
+import { DexFrame, getFrameList, isPublic } from './frames'
 import { isSupported } from '../../core/db/streamers'
 import { removeDupeObjects } from '../../helpers'
 
@@ -20,8 +20,9 @@ async function continuouslyEmitNewFrames (
 ): Promise<void> {
   const allFrames = await getFrameList ()
   const newFrames = removeDupeObjects (
-  allFrames?.filter (
-    frame => isNew (frame, previousFrames) && !isFreeChat (frame)) ?? []
+    allFrames?.filter (
+      frame => isNew (frame, previousFrames) && !isFreeChat (frame) && isPublic (frame)
+    )?? []
   )
 
   newFrames.forEach (frame => {
@@ -42,8 +43,8 @@ function isNew (frame: DexFrame, previousFrames: DexFrame[]): boolean {
 
 function isFreeChat (frame: DexFrame): boolean {
   // polka and kson, will improve this later
-  const exceptions = ['UCK9V2B22uJYu3N7eR_BT9QA','UC9ruVYPv7yJmV0Rh0NKA-Lw', 'UCS9uQI-jC3DE0L4IpXyvr6w']
+  const exceptions = ['UCK9V2B22uJYu3N7eR_BT9QA','UC9ruVYPv7yJmV0Rh0NKA-Lw', 'UshZgOv3YDEs-ZnZWDYVwJdmA', 'UCAWSyEs_Io8MtpY3m-zqILA', 'UCZgOv3YDEs-ZnZWDYVwJdmA', 'UCl_gCybOJRIgOXw6Qb4qJzQ']
   const isException = exceptions.some (ch => ch === frame.channel.id)
   const isFreeChat = ['freechat', 'free chat', 'freeechat', 'フリーチャット'].some (pattern => frame.title.toLowerCase ().includes (pattern))
-  return isFreeChat && !isException
+  return isFreeChat && !isException && frame.status !== 'live'
 }

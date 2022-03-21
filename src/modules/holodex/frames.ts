@@ -26,7 +26,15 @@ export async function _getFrameList (): Promise<DexFrame[]> {
 }
 
 export function isPublic (frame: DexFrame): boolean {
+  const patterns = [
+    `members only`,
+    `member's only`,
+    `member`,
+    `メン限`,
+    `メンバー限定`
+  ]
   return frame.topic_id !== 'membersonly'
+    && !patterns.some (p => frame.title.toLowerCase().includes (p))
 }
 
 export async function getStartTime (

@@ -1,24 +1,31 @@
-import { ciEquals, doNothing, match } from '../../helpers'
+import { ciEquals, doNothing, isJp, match } from '../../helpers'
 import { DexFrame } from '../holodex/frames'
 import { Streamer, StreamerName, streamers, streamersMap } from '../../core/db/streamers'
 import { emoji } from '../../helpers/discord'
 import { Snowflake } from 'discord.js'
 import { tl } from '../deepl'
 import { isBlacklistedOrUnwanted, isHoloID, isStreamer, isTl } from './commentBooleans'
-import { GuildSettings, WatchFeature, WatchFeatureSettings } from '../../core/db/models'
-import { ChatComment, Entry, Entries, Blacklist } from './chatRelayer'
+import { GuildSettings, WatchFeatureSettings } from '../../core/db/models'
+import { ChatComment, Entries, Blacklist } from './chatRelayer'
 import { AddChatItemAction, runsToString, MasterchatError, Masterchat } from 'masterchat'
 
 export default (input: ChatWorkerInput): void => {
   allEntries = input.allEntries
+  let wentLive = false
   input.port.on ('message', (msg: any) => { // TODO: refine any
     if (msg._tag === 'EntryUpdate') {
       allEntries = msg.entries
     }
     if (msg._tag === 'FrameUpdate') { // TODO: don't mutate input
+      if (msg.status === 'live') {
+        wentLive = true
+        chat.stop()
+        input.port.postMessage ({_tag: 'EndTask', frame: input.frame, wentLive})
+      }
       input.frame.status = msg.status
     }
   })
+  if (input.frame.status === 'live') return
   const chat =
     new Masterchat (input.frame.id, input.frame.channel.id, { mode: 'live' })
 
@@ -33,9 +40,11 @@ export default (input: ChatWorkerInput): void => {
     errorCode: err instanceof MasterchatError ? err.code : undefined
   }))
 
-  chat.on ('end', () => input.port.postMessage ({
-    _tag: 'EndTask', frame: input.frame
-  }))
+  chat.on ('end', () => {
+    input.port.postMessage ({
+      _tag: 'EndTask', frame: input.frame, wentLive
+    })
+  })
 
   chat.listen ({ ignoreFirstResponse: true })
 }
@@ -76,9 +85,14 @@ interface EndTask {
   _tag: 'EndTask'
   frame: DexFrame
   errorCode?: string
+  wentLive?: boolean
 }
 
-export type Task = SendMessageTask | SaveMessageTask | LogCommentTask | EndTask
+export type Task
+  = SendMessageTask
+  | SaveMessageTask
+  | LogCommentTask
+  | EndTask
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -96,23 +110,25 @@ function toChatComments (chats: AddChatItemAction[]): ChatComment[] {
   }))
 }
 
-async function processComments (
-  frame: DexFrame, cmts: ChatComment[]
+export async function processComments (
+  frame: DexFrame, cmts: ChatComment[], entrs?: Entries
 ): Promise<Task[]> {
   const tasks = await Promise.all (cmts.flatMap (async cmt => {
+    const isTl_       = cmt.isTl || isTl (cmt.body)
+    const isStreamer_ = cmt.isV || isStreamer (cmt.id)
     const streamer    = streamersMap.get (frame.channel.id)
     const author      = streamersMap.get (cmt.id)
-    const isCameo     = isStreamer (cmt.id) && !cmt.isOwner
-    const mustDeepL   = isStreamer (cmt.id) && !isHoloID (streamer)
+    const isCameo     = isStreamer_ && !cmt.isOwner
+    const mustDeepL   = isStreamer_ && !isHoloID (streamer)
     const deepLTl     = mustDeepL ? await tl (cmt.body) : undefined
     const mustShowTl  = mustDeepL && deepLTl !== cmt.body
-    const maybeGossip = isStreamer (cmt.id) || isTl (cmt.body)
-    const entries     = allEntries.filter (([{}, {}, f, e]) =>
+    const maybeGossip = isStreamer_ || isTl_
+    const entries     = (entrs ?? allEntries).filter (([{}, {}, f, e]) =>
       [(f === 'cameos' ? author : streamer)?.name, 'all'].includes (e.streamer)
       || f === 'gossip'
     )
 
-    const mustSave = isTl (cmt.body) || isStreamer (cmt.id)
+    const mustSave = isTl_ || isStreamer_
 
     const saveTask: SaveMessageTask = {
       _tag: 'SaveMessageTask',
@@ -150,8 +166,9 @@ function relayCameo (
   const groups  = stalked?.groups as string[]|undefined
   const camEmj  = groups?.includes ('Nijisanji') ? emoji.niji : emoji.holo
   const emj     = isGossip ? emoji.peek : camEmj
+  const mustTl  = deepLTl && g.deepl
   const line1   = `${emj} **${cmt.name}** in **${to}**'s chat: \`${cleaned}\``
-  const line2   = deepLTl ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\`` : ''
+  const line2   = mustTl ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\`` : ''
   const line3   = `\n<https://youtu.be/${frame.id}>`
   return {
     _tag: "SendMessageTask",
@@ -167,7 +184,7 @@ function relayGossip (
   data: RelayData
 ): SendMessageTask|undefined {
   const stalked = streamers.find (s => s.name === data.e.streamer)
-  return (isGossip (data.cmt.body, stalked!, data.frame))
+  return stalked && (isGossip (data.cmt, stalked, data.frame))
     ? relayCameo (data, true)
     : undefined
 }
@@ -175,15 +192,16 @@ function relayGossip (
 function relayTlOrStreamerComment (
   { discordCh, bl, deepLTl, cmt, g, frame }: RelayData
 ): Task|undefined {
+  const isATl    = (cmt.isTl || (isTl (cmt.body, g)))
   const mustPost = cmt.isOwner
-                || (isTl (cmt.body, g) && !isBlacklistedOrUnwanted (cmt, g, bl))
+                || (isATl && !isBlacklistedOrUnwanted (cmt, g, bl))
                 || isStreamer (cmt.id)
                 || (cmt.isMod && g.modMessages && !isBlacklistedOrUnwanted (cmt, g, bl))
 
   const vauthor = streamersMap.get (cmt.id)
   const groups  = vauthor?.groups as string[]|undefined
   const vemoji  = groups?.includes ('Nijisanji') ? emoji.niji : emoji.holo
-  const premoji = isTl (cmt.body, g)  ? ':speech_balloon:'
+  const premoji = isATl               ? ':speech_balloon:'
                 : isStreamer (cmt.id) ? vemoji
                                       : ':tools:'
 
@@ -191,7 +209,7 @@ function relayTlOrStreamerComment (
             : deepLTl                 ? `\n<https://youtu.be/${frame.id}>`
                                       : ` | <https://youtu.be/${frame.id}>`
 
-  const author = isTl (cmt.body, g) ? `||${cmt.name}:||` : `**${cmt.name}:**`
+  const author = isATl ? `||${cmt.name}:||` : `**${cmt.name}:**`
   const text   = cmt.body.replaceAll ('`', "''")
   const tl     = deepLTl && g.deepl
     ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\``
@@ -213,17 +231,19 @@ function relayTlOrStreamerComment (
     : undefined
 }
 
-function isGossip (text: string, stalked: Streamer, frame: DexFrame): boolean {
+function isGossip (cmt: ChatComment, stalked: Streamer, frame: DexFrame): boolean {
   const isOwnChannel = frame.channel.id === stalked.ytId
   const isCollab =
     [stalked.twitter, stalked.ytId, stalked.name, stalked.chName]
       .some (str => frame.description.includes (str))
-  const mentionsWatched = text
+  const mentionsWatched = cmt.body
     .replace(/[,()]|'s/g, '')
+    .replaceAll('-', ' ')
     .split (' ')
     .some (w => stalked.aliases.some (a => ciEquals (a, w)))
-  
-  return !isOwnChannel && !isCollab && mentionsWatched
+    || stalked.aliases.some (a => isJp (a) && cmt.body.includes (a))
+
+  return !isOwnChannel && !isCollab && mentionsWatched && cmt.id !== stalked.ytId
 }
 
 interface RelayData {
