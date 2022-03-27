@@ -27,6 +27,7 @@ export async function interactionCreate(intr: Interaction): Promise<void> {
   await (intr as any).deferReply?.()
   if (intr.isButton()) tryOrLog(() => processButton(intr as any))
   if (intr.isCommand() || intr.isContextMenu()) {
+    if (!commands.find((v,k) => k === intr.commandName)) return
     if (await isAuthorTooLowLevel(intr.commandName, intr.member as GuildMember)) {
       reply(
         intr,
