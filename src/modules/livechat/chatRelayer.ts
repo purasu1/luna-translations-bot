@@ -30,7 +30,10 @@ if (isMainThread)
     if (isPublic(frame)) {
       if (frame.status === 'live') {
         setupLive(frame)
-      } else setupRelay(frame)
+      } else {
+        //setupRelay(frame)
+        log(`${frame.id} is upcoming, not relaying`)
+      }
     }
   })
 
