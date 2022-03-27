@@ -24,6 +24,7 @@ import { commands } from '../lunaBotClient'
 
 export async function interactionCreate(intr: Interaction): Promise<void> {
   if (!intr.inGuild()) return
+  (intr as any).deferReply?.()
   if (intr.isButton()) tryOrLog(() => processButton(intr as any))
   if (intr.isCommand() || intr.isContextMenu()) {
     if (await isAuthorTooLowLevel(intr.commandName, intr.member as GuildMember)) {
