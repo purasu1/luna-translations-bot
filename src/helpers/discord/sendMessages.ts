@@ -29,17 +29,16 @@ export async function reply(
   file?: MessageAttachment,
 ): Promise<Message | Message[] | undefined | void> {
   if (!canBot('SEND_MESSAGES', msg.channel)) return
+  const replyFn = msg instanceof Message ? msg.reply.bind(msg) : msg.editReply.bind(msg)
   if (msg instanceof ContextMenuInteraction) {
-    return msg
-      .reply({
+    return replyFn({
         ...(embed ? { embeds: isArray(embed) ? embed : [embed] } : {}),
         ...(text ? { content: text } : {}),
         ...(file ? { files: [file] } : {}),
       })
       .catch(warn)
   } else {
-    return msg
-      .reply({
+    return replyFn({
         ...(embed ? { embeds: isArray(embed) ? embed : [embed] } : {}),
         ...(text ? { content: text } : {}),
         ...(file ? { files: [file] } : {}),
