@@ -1,21 +1,26 @@
-import { Message } from 'discord.js'
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { CommandInteraction } from 'discord.js'
 import { Command, createEmbed, reply } from '../../helpers/discord'
 import { getStreamerList } from '../db/streamers/'
 
+const description = 'Lists supported YT channels'
+
 export const list: Command = {
   config: {
-    aliases:   ['streamers', 'idols', 'vtubers', 'channels', 'l'],
-    permLevel: 0
+    permLevel: 0,
   },
   help: {
-    category:    'General',
-    usage:       'list',
+    category: 'General',
     description: 'Lists supported YT channels.',
   },
-  callback: (msg: Message): void => {
-    reply (msg, createEmbed ({
-      title: 'Supported channels',
-      description: getStreamerList ()
-    }))
-  }
+  slash: new SlashCommandBuilder().setName('list').setDescription(description),
+  callback: (intr: CommandInteraction): void => {
+    reply(
+      intr,
+      createEmbed({
+        title: 'Supported channels',
+        description: getStreamerList(),
+      }),
+    )
+  },
 }

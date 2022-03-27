@@ -7,90 +7,81 @@ import { Snowflake } from 'discord.js'
 import { StreamerName } from '../streamers/'
 
 export class WatchFeatureSettings {
-  @prop ({ required: true })
+  @prop({ required: true })
   public streamer: StreamerName
 
-  @prop ({ type: () => String, required: true })
+  @prop({ type: () => String, required: true })
   public discordCh: Snowflake
 
-  @prop ({ type: () => String })
+  @prop({ type: () => String })
   public roleToNotify?: Snowflake
 }
 
 export class BlacklistItem {
-  @prop ({ required: true })
+  @prop({ required: true })
   public ytId: string
 
-  @prop ({ required: true })
+  @prop({ required: true })
   public name: string
 
-  @prop ()
+  @prop()
   public reason?: string
 }
 
 export class GuildSettings {
-  @prop ({ type: () => String })
+  @prop({ type: () => String })
   public _id: Snowflake
 
-  @prop ({ type: () => [String], default: [] })
+  @prop({ type: () => [String], default: [] })
   public admins: Snowflake[]
 
-  @prop ({ type: () => BlacklistItem, default: [] })
+  @prop({ type: () => BlacklistItem, default: [] })
   public blacklist: BlacklistItem[]
 
-  @prop ({ type: () => [String], default: [] })
+  @prop({ type: () => [String], default: [] })
   public blacklisters: Snowflake[]
 
-  @prop ({ type: () => WatchFeatureSettings, default: [] })
+  @prop({ type: () => WatchFeatureSettings, default: [] })
   public cameos: WatchFeatureSettings[]
 
-  @prop ({ type: () => WatchFeatureSettings, default: [] })
+  @prop({ type: () => WatchFeatureSettings, default: [] })
   public community: WatchFeatureSettings[]
 
-  @prop ({ type: () => [String], default: [] })
+  @prop({ type: () => [String], default: [] })
   public customWantedPatterns: string[]
-  
-  @prop ({ type: () => [String], default: [] })
+
+  @prop({ type: () => [String], default: [] })
   public customBannedPatterns: string[]
 
-  @prop ({ default: true })
+  @prop({ default: true })
   public deepl: boolean
 
-  @prop ({ type: () => String })
+  @prop({ type: () => String })
   public logChannel?: Snowflake
 
-  @prop ({ type: () => WatchFeatureSettings, default: [] })
+  @prop({ type: () => WatchFeatureSettings, default: [] })
   public gossip: WatchFeatureSettings[]
 
-  @prop ({ default: true })
+  @prop({ default: true })
   public modMessages: boolean
 
-  @prop ({ type: () => WatchFeatureSettings, default: [] })
+  @prop({ type: () => WatchFeatureSettings, default: [] })
   public relay: WatchFeatureSettings[]
 
-  @prop ({ default: false })
+  @prop({ default: false })
   public threads: boolean
 
-  @prop ({ type: () => WatchFeatureSettings, default: [] })
+  @prop({ type: () => WatchFeatureSettings, default: [] })
   public twitcasting: WatchFeatureSettings[]
 
-  @prop ({ type: () => WatchFeatureSettings })
+  @prop({ type: () => WatchFeatureSettings })
   youtube: WatchFeatureSettings[]
 }
 
-export const GuildSettingsDb = getModelForClass (GuildSettings)
+export const GuildSettingsDb = getModelForClass(GuildSettings)
 
 export type RoleSetting = 'admins' | 'blacklisters'
 
-export type WatchFeature =
-  | 'community'
-  | 'gossip'
-  | 'cameos'
-  | 'relay'
-  | 'twitcasting'
-  | 'youtube'
+export type WatchFeature = 'community' | 'gossip' | 'cameos' | 'relay' | 'twitcasting' | 'youtube'
 
-export type SettingToggle =
-  | 'deepl'
-  | 'modMessages'
-  | 'threads'
+export type SettingToggle = 'deepl' | 'modMessages' | 'threads'

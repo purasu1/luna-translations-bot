@@ -1,22 +1,30 @@
 import { Command } from '../../helpers/discord'
-import { Message } from 'discord.js'
-import { oneLine } from 'common-tags'
-import { validateInputAndModifyRoleList } from '../db/functions/roles'
+import { CommandInteraction } from 'discord.js'
+import { modifyRoleList } from '../db/functions/roles'
+import { roleListCommand } from '../../helpers/discord/slash'
+
+const description =
+  'Add or remove a role to blacklisters. (Bot admins + ppl with kick perms are alr blacklisters.)'
 
 export const blacklisters: Command = {
   config: {
-    aliases:   [],
-    permLevel: 2
+    permLevel: 2,
   },
   help: {
     category: 'General',
-    usage:    'blacklisters <add|remove> <role mention|ID>',
-    description: oneLine`
-      Add or remove a role to the bot blacklister list.
-      (Admins and people with kick permissions are automatically blacklisters.)
-    `,
+    description,
   },
-  callback: (msg: Message, [verb, role]: string[]): void => {
-    validateInputAndModifyRoleList ({ type: 'blacklisters', msg, verb, role })
-  }
+  slash: roleListCommand({
+    name: 'blacklisters',
+    description,
+    roleListName: 'the bot blacklister list',
+  }),
+  callback: (intr: CommandInteraction): void => {
+    modifyRoleList({
+      type: 'admins',
+      intr,
+      verb: intr.options.getSubcommand(true),
+      role: intr.options.getRole('role')!.id,
+    })
+  },
 }

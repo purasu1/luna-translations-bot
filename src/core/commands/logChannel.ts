@@ -1,40 +1,46 @@
-import { Message, Snowflake } from 'discord.js'
-import { head, isEmpty, isNil } from 'ramda'
+import { SlashCommandBuilder } from '@discordjs/builders'
+import { CommandInteraction, Snowflake } from 'discord.js'
 import { Command, createEmbedMessage, reply } from '../../helpers/discord'
 import { updateSettings } from '../db/functions'
-import { client } from '../lunaBotClient'
+
+const description = 'Redirect TL logs to specified channel, or clear the setting.'
 
 export const logChannel: Command = {
   config: {
-    aliases:   ['logchannel', 'logch', 'logCh'],
-    permLevel: 2
+    permLevel: 2,
   },
   help: {
-    category:    'Relay',
-    usage:       'logChannel <optional: channel>',
-    description: 'Redirect TL logs to specified channel, or clear the setting.'
+    category: 'Relay',
+    description,
   },
-  callback: async (msg: Message, args: string[]): Promise<void> => {
-    const channelMention = head (args)
-    const channelId      = channelMention?.match(/<#(.*?)>/)?.[1]
-    const channelObj     = client.channels.cache.find (c => c.id === channelId)
-    const processMsg     = isEmpty (args)     ? clearSetting
-                         : isNil (channelObj) ? respondInvalid
-                                              : setLogChannel
-    processMsg (msg, channelId!)
-  }
+  slash: new SlashCommandBuilder()
+    .setName('logchannel')
+    .setDescription(description)
+    .addChannelOption((option) => option.setName('channel').setDescription('discord channel')),
+  callback: async (intr: CommandInteraction): Promise<void> => {
+    const channel = intr.options.getChannel('channel')
+    // const channelMention = intr.options.getChannel('channel')
+    const channelId = channel?.id
+    const processMsg =
+      channel == null
+        ? clearSetting
+        : !intr.guild?.channels?.cache.find((c) => c.id == channelId)
+        ? respondInvalid
+        : setLogChannel
+    processMsg(intr, channelId!)
+  },
 }
 
-function clearSetting (msg: Message): void {
-  updateSettings (msg, { logChannel: undefined })
-  reply (msg, createEmbedMessage ('Logs will be posted in the relay channel.'))
+function clearSetting(intr: CommandInteraction): void {
+  updateSettings(intr, { logChannel: undefined })
+  reply(intr, createEmbedMessage('Logs will be posted in the relay channel.'))
 }
 
-function respondInvalid (msg: Message): void {
-  reply (msg, createEmbedMessage (`Invalid channel supplied.`))
+function respondInvalid(intr: CommandInteraction): void {
+  reply(intr, createEmbedMessage(`Invalid channel supplied.`))
 }
 
-function setLogChannel (msg: Message, channelId: Snowflake): void {
-  updateSettings (msg, { logChannel: channelId })
-  reply (msg, createEmbedMessage (`Logs will be posted in <#${channelId}>.`))
+function setLogChannel(intr: CommandInteraction, channelId: Snowflake): void {
+  updateSettings(intr, { logChannel: channelId })
+  reply(intr, createEmbedMessage(`Logs will be posted in <#${channelId}>.`))
 }

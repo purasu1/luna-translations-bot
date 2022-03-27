@@ -9,39 +9,37 @@ import { notifyDiscord } from './notify'
 import { isMainThread } from 'worker_threads'
 const { twitcastingId, twitcastingSecret } = config
 
-if (isMainThread) initTwitcast ()
+if (isMainThread) initTwitcast()
 
-function initTwitcast (): void {
-  const socket = new WebSocket (
-    `wss://${twitcastingId}:${twitcastingSecret}@realtime.twitcasting.tv/lives`
+function initTwitcast(): void {
+  const socket = new WebSocket(
+    `wss://${twitcastingId}:${twitcastingSecret}@realtime.twitcasting.tv/lives`,
   )
-  socket.on ('error',   socket.close)
-  socket.on ('close',   initTwitcast)
-  socket.on ('message', processMessage)
+  socket.on('error', socket.close)
+  socket.on('close', initTwitcast)
+  socket.on('message', processMessage)
 }
 
-async function processMessage (data: any): Promise<void> {
-  const json     = tryOrLog (() => JSON.parse (data as string))
-  const lives    = json?.movies?.map (processPayloadEntry) as any[]
-  const settings = getAllSettings ()
-  lives?.forEach (live => notifyLive (live, settings))
+async function processMessage(data: any): Promise<void> {
+  const json = tryOrLog(() => JSON.parse(data as string))
+  const lives = json?.movies?.map(processPayloadEntry) as any[]
+  const settings = getAllSettings()
+  lives?.forEach((live) => notifyLive(live, settings))
 }
 
-function processPayloadEntry (message: any): TwitcastingLive {
-  return ({
-    name:    message.broadcaster?.screen_id,
-    movieId: message.movie?.id
-  })
+function processPayloadEntry(message: any): TwitcastingLive {
+  return {
+    name: message.broadcaster?.screen_id,
+    movieId: message.movie?.id,
+  }
 }
 
-async function notifyLive (
-  live: TwitcastingLive, settings: GuildSettings[]
-): Promise<void> {
-  return notifyDiscord ({
+async function notifyLive(live: TwitcastingLive, settings: GuildSettings[]): Promise<void> {
+  return notifyDiscord({
     avatarUrl: '',
-    subbedGuilds: settings.filter (g => isRelaying (g, live.name)),
+    subbedGuilds: settings.filter((g) => isRelaying(g, live.name)),
     feature: 'twitcasting',
-    streamer: streamers.find (x => x.twitter === live.name) as Streamer,
+    streamer: streamers.find((x) => x.twitter === live.name) as Streamer,
     emoji: emoji.tc,
     embedBody: `
       I am live on Twitcasting!
@@ -50,14 +48,12 @@ async function notifyLive (
   })
 }
 
-function isRelaying (guild: GuildSettings, streamer: TwitterName): boolean {
-  return guild
-    .twitcasting
-    .some (entry => streamer === getTwitterUsername (entry.streamer))
+function isRelaying(guild: GuildSettings, streamer: TwitterName): boolean {
+  return guild.twitcasting.some((entry) => streamer === getTwitterUsername(entry.streamer))
 }
 
 interface TwitcastingLive {
-  name:    string
+  name: string
   movieId: string
 }
 

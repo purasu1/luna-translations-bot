@@ -1,49 +1,46 @@
-import { Message } from 'discord.js'
-import { head, isEmpty } from 'ramda'
-import { config } from '../../config'
+import { CommandInteraction } from 'discord.js'
 import { Command, createEmbedMessage, reply, send } from '../../helpers/discord'
 import { getStartTime, VideoId } from '../../modules/holodex/frames'
 import { getRelayHistory, filterAndStringifyHistory } from '../db/functions'
 import { RelayedComment } from '../db/models/RelayedComment'
+import { SlashCommandBuilder } from '@discordjs/builders'
+
+const description = 'Posts the archived relay log for a given video ID.'
 
 export const log: Command = {
   config: {
-    aliases:   ['history', 'tlLog', 'relayLog'],
-    permLevel: 0
+    permLevel: 0,
   },
   help: {
-    category:    'Relay',
-    usage:       'log <video ID>',
-    description: 'Posts the archived relay log for a given video ID.'
+    category: 'Relay',
+    description,
   },
-  callback: async (msg: Message, args: string[]): Promise<void> => {
-    const videoId    = head (args)
-    const history    = await getRelayHistory (videoId)
-    const processMsg = isEmpty (args) ? showHelp
-                     : !history       ? notifyLogNotFound
-                                      : sendLog
+  slash: new SlashCommandBuilder()
+    .setName('log')
+    .setDescription(description)
+    .addStringOption((option) => option.setName('videoid').setDescription('Video ID').setRequired(true)),
+  callback: async (intr: CommandInteraction) => {
+    const videoId = intr.options.getString('videoid')!
+    const history = await getRelayHistory(videoId)
+    const processMsg = !history ? notifyLogNotFound : sendLog
 
-    processMsg (msg, videoId!, history!)
-  }
+    processMsg(intr, videoId!, history!)
+  },
 }
 
-function showHelp (msg: Message): void {
-  reply (msg, createEmbedMessage (`
-    **Usage:** \`${config.prefix}${log.help.usage}\`
-  `))
+function notifyLogNotFound(intr: CommandInteraction, videoId: VideoId): void {
+  reply(intr, createEmbedMessage(`Log not found for ${videoId}`))
 }
 
-function notifyLogNotFound (msg: Message, videoId: VideoId): void {
-  reply (msg, createEmbedMessage (`Log not found for ${videoId}`))
-}
-
-async function sendLog (
-  msg: Message, videoId: VideoId, history: RelayedComment[]
+async function sendLog(
+  intr: CommandInteraction,
+  videoId: VideoId,
+  history: RelayedComment[],
 ): Promise<void> {
-  const start = await getStartTime (videoId)
-  const tlLog = filterAndStringifyHistory (msg, history, start)
-  send (msg.channel, {
+  const start = await getStartTime(videoId)
+  const tlLog = filterAndStringifyHistory(intr, history, start)
+  send(intr.channel!, {
     content: `Here is the TL log for <https://youtu.be/${videoId}>`,
-    files:   [{ attachment: Buffer.from (tlLog), name: `${videoId}.txt` }]
+    files: [{ attachment: Buffer.from(tlLog), name: `${videoId}.txt` }],
   })
 }

@@ -1,112 +1,131 @@
 import { Command, createEmbed, reply } from '../../helpers/discord'
 import { getSettings, updateSettings } from '../db/functions'
-import { EmbedFieldData, Message } from 'discord.js'
-import { config } from '../../config'
+import { CommandInteraction, EmbedFieldData } from 'discord.js'
 import { oneLine } from 'common-tags'
-import { isEmpty } from 'ramda'
 import { GuildSettings } from '../db/models'
+import { SlashCommandBuilder } from '@discordjs/builders'
 
-const usage = 'filter <blacklist|whitelist> <add|remove> <pattern>'
+const description = 'Manage custom-banned strings and custom-desired strings.'
 
 export const filter: Command = {
   config: {
-    aliases:   [],
-    permLevel: 1
+    permLevel: 1,
   },
   help: {
     category: 'Relay',
-    usage,
     description: 'Manage custom-banned strings and custom-desired strings.',
   },
-  callback: (msg: Message, [type, verb, ...pattern]: string[]): void => {
-    const str            = pattern.join ('')
-    const g              = getSettings (msg)
-    const feature        = type === 'blacklist' ? 'customBannedPatterns'
-                                                : 'customWantedPatterns'
-    const current        = g[feature]
-    const isListValid    = validLists.includes (type as any)
-    const isVerbValid    = validVerbs.includes (verb as any)
-    const mustShowHelp   = !isListValid || !isVerbValid || isEmpty (pattern)
-    const isPatternValid = verb === 'add' ? current.every (s => s !== str)
-                                          : current.find (s => s === str)
-    const modifyIfValid  = mustShowHelp   ? showHelp
-                         : isPatternValid ? modifyList
-                                          : notifyInvalidPattern
+  slash: new SlashCommandBuilder()
+    .setName('filter')
+    .setDescription(description)
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('add')
+        .setDescription('add pattern to pattern-blacklist')
+        .addStringOption((option) =>
+          option.setName('pattern').setDescription('pattern').setRequired(true),
+        ),
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('remove')
+        .setDescription('remove pattern from pattern-blacklist')
+        .addStringOption((option) =>
+          option.setName('pattern').setDescription('pattern').setRequired(true),
+        ),
+    ),
+  callback: (intr: CommandInteraction): void => {
+    const str = intr.options.getString('pattern')!
+    const g = getSettings(intr)
+    const feature = 'customBannedPatterns'
+    const current = g[feature]
+    const verb = intr.options.getSubcommand(true) as 'add' | 'remove'
+    const isPatternValid =
+      verb === 'add' ? current.every((s) => s !== str) : current.find((s) => s === str)
+    const modifyIfValid = isPatternValid ? modifyList : notifyInvalidPattern
 
-    modifyIfValid ({
-      msg, type: type as ValidList, verb: verb as ValidVerb, pattern: str, g
+    modifyIfValid({
+      intr,
+      type: 'blacklist',
+      verb,
+      pattern: str,
+      g,
     })
-  }
+  },
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 const validLists = ['blacklist', 'whitelist'] as const
 const validVerbs = ['add', 'remove'] as const
-type ValidList   = typeof validLists[number]
-type ValidVerb   = typeof validVerbs[number]
+type ValidList = typeof validLists[number]
+type ValidVerb = typeof validVerbs[number]
 
 interface ModifyPatternListOptions {
-  msg:     Message
-  type:    ValidList
-  verb:    ValidVerb
+  intr: CommandInteraction
+  type: ValidList
+  verb: ValidVerb
   pattern: string
-  g:       GuildSettings
+  g: GuildSettings
 }
 
-function showHelp ({ msg, g }: ModifyPatternListOptions): void {
-  reply (msg, createEmbed ({ fields: [{
-    name:   'Usage',
-    value:  config.prefix + usage,
-  },
-  ...createListFields (g.customWantedPatterns, g.customBannedPatterns)
-  ]}))
-}
-
-async function modifyList (opts: ModifyPatternListOptions): Promise<void> {
-  const feature = opts.type === 'blacklist' ? 'customBannedPatterns'
-                                            : 'customWantedPatterns'
+async function modifyList(opts: ModifyPatternListOptions): Promise<void> {
+  const feature = opts.type === 'blacklist' ? 'customBannedPatterns' : 'customWantedPatterns'
   const current = opts.g[feature]
-  const edited  = opts.verb === 'add' ? [...current, opts.pattern]
-                                      : current.filter (s => s !== opts.pattern)
+  const edited =
+    opts.verb === 'add' ? [...current, opts.pattern] : current.filter((s) => s !== opts.pattern)
 
-  updateSettings (opts.msg, { [feature]: edited })
+  updateSettings(opts.intr, { [feature]: edited })
 
-  reply (opts.msg, createEmbed ({ fields: [{
-    name:   'Success',
-    value:  oneLine`
+  reply(
+    opts.intr,
+    createEmbed({
+      fields: [
+        {
+          name: 'Success',
+          value: oneLine`
       ${opts.pattern} was ${opts.verb === 'add' ? 'added to' : 'removed from'}
       the ${opts.type}.
     `,
-  },   ...createListFields (
-    opts.type === 'whitelist' ? edited : opts.g.customWantedPatterns,
-    opts.type === 'blacklist' ? edited : opts.g.customBannedPatterns
-  )]}))
+        },
+        ...createListFields(
+          opts.type === 'whitelist' ? edited : opts.g.customWantedPatterns,
+          opts.type === 'blacklist' ? edited : opts.g.customBannedPatterns,
+        ),
+      ],
+    }),
+  )
 }
 
-function notifyInvalidPattern (opts: ModifyPatternListOptions): void {
-  reply (opts.msg, createEmbed ({ fields: [{
-    name:   'Failure',
-    value:  oneLine`
+function notifyInvalidPattern(opts: ModifyPatternListOptions): void {
+  reply(
+    opts.intr,
+    createEmbed({
+      fields: [
+        {
+          name: 'Failure',
+          value: oneLine`
       ${opts.pattern} was ${opts.verb === 'add' ? 'already' : 'not found'}
       in the ${opts.type}.
     `,
-  },
-  ...createListFields (opts.g.customWantedPatterns, opts.g.customBannedPatterns)
-  ]}))
+        },
+        ...createListFields(opts.g.customWantedPatterns, opts.g.customBannedPatterns),
+      ],
+    }),
+  )
 }
 
-
-function createListFields (
-  whitelist: string[], blacklist: string[]
-): EmbedFieldData[] {
-  return [{
-    name: 'Current whitelist',
-    value: whitelist.join (', ') || '*Nothing yet*',
-    inline: false,
-  }, {
-    name: 'Current blacklist',
-    value: blacklist.join (', ') || '*Nothing yet*',
-    inline: false,
-  }]
+function createListFields(whitelist: string[], blacklist: string[]): EmbedFieldData[] {
+  return [
+    {
+      name: 'Current whitelist',
+      value: whitelist.join(', ') || '*Nothing yet*',
+      inline: false,
+    },
+    {
+      name: 'Current blacklist',
+      value: blacklist.join(', ') || '*Nothing yet*',
+      inline: false,
+    },
+  ]
 }

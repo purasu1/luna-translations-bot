@@ -9,94 +9,103 @@ import {
   MessageEmbedThumbnail,
   MessageOptions,
   MessagePayload,
-  TextBasedChannels,
+  TextBasedChannel,
   EmojiIdentifierResolvable,
   MessageReaction,
   MessageButtonOptions,
   MessageButton,
   MessageActionRow,
+  CommandInteraction,
+  ContextMenuInteraction,
 } from 'discord.js'
 import { warn } from '../logging'
 import { canBot } from './general'
 const { isArray } = Array
 
-export async function reply (
-  msg:    Message,
+export async function reply(
+  msg: Message | CommandInteraction | ContextMenuInteraction,
   embed?: MessageEmbed | MessageEmbed[],
-  text?:  string,
-  file?:  MessageAttachment,
-): Promise<(Message | Message[] | undefined)> {
-  return canBot ('SEND_MESSAGES', msg.channel)
-    ? msg.reply ({
-      ...(embed ? { embeds:  isArray (embed) ? embed : [embed] } : {}),
-      ...(text  ? { content: text }    : {}),
-      ...(file  ? { files:   [file] }  : {}),
-      failIfNotExists: false
-    }).catch (warn)
-    : undefined
+  text?: string,
+  file?: MessageAttachment,
+): Promise<Message | Message[] | undefined | void> {
+  if (!canBot('SEND_MESSAGES', msg.channel)) return
+  if (msg instanceof ContextMenuInteraction) {
+    return msg
+      .reply({
+        ...(embed ? { embeds: isArray(embed) ? embed : [embed] } : {}),
+        ...(text ? { content: text } : {}),
+        ...(file ? { files: [file] } : {}),
+      })
+      .catch(warn)
+  } else {
+    return msg
+      .reply({
+        ...(embed ? { embeds: isArray(embed) ? embed : [embed] } : {}),
+        ...(text ? { content: text } : {}),
+        ...(file ? { files: [file] } : {}),
+        failIfNotExists: false,
+      })
+      .catch(warn)
+  }
 }
 
-export async function send (
-  channel: TextBasedChannels | undefined,
-  content: string | MessageOptions | MessagePayload
+export async function send(
+  channel: TextBasedChannel | undefined,
+  content: string | MessageOptions | MessagePayload,
 ): Promise<Message | undefined> {
-  return canBot ('SEND_MESSAGES', channel)
-    ? channel!.send (content).catch (e => warn (`${channel!.id} ${e}`))
+  return canBot('SEND_MESSAGES', channel)
+    ? channel!.send(content).catch((e) => warn(`${channel!.id} ${e}`))
     : undefined
 }
 
-export function createEmbedMessage (
-  body: string, fancy: boolean = false
-): MessageEmbed {
-  return createEmbed ({
-    author:      fancy ? getEmbedSelfAuthor ()    : undefined,
-    thumbnail:   fancy ? getEmbedSelfThumbnail () : undefined,
-    description: body
+export function createEmbedMessage(body: string, fancy: boolean = false): MessageEmbed {
+  return createEmbed({
+    author: fancy ? getEmbedSelfAuthor() : undefined,
+    thumbnail: fancy ? getEmbedSelfThumbnail() : undefined,
+    description: body,
   })
 }
 
-export function createEmbed (
-  options: Partial<MessageEmbedOptions>, fancy: boolean = false
+export function createEmbed(
+  options: Partial<MessageEmbedOptions>,
+  fancy: boolean = false,
 ): MessageEmbed {
   const base: Partial<MessageEmbedOptions> = {
-    author:    fancy ? getEmbedSelfAuthor () : undefined,
-    color:     '#8e4497',
-    thumbnail: fancy ? getEmbedSelfThumbnail () : undefined
+    author: fancy ? getEmbedSelfAuthor() : undefined,
+    color: '#8e4497',
+    thumbnail: fancy ? getEmbedSelfThumbnail() : undefined,
   }
-  return new MessageEmbed (merge (base, options))
+  return new MessageEmbed(merge(base, options))
 }
 
-export function createTxtEmbed (
-  title: string, content: string
-): MessageAttachment {
-  return new MessageAttachment (Buffer.from (content, 'utf-8'), title)
+export function createTxtEmbed(title: string, content: string): MessageAttachment {
+  return new MessageAttachment(Buffer.from(content, 'utf-8'), title)
 }
 
-export async function react (
-  msg: Message | undefined, emj: EmojiIdentifierResolvable
+export async function react(
+  msg: Message | undefined,
+  emj: EmojiIdentifierResolvable,
 ): Promise<MessageReaction | undefined> {
-  if (canBot ('ADD_REACTIONS', msg?.channel)) {
-    return msg?.react (emj)
+  if (canBot('ADD_REACTIONS', msg?.channel)) {
+    return msg?.react(emj)
   }
 }
 
-export function ButtonRow (
-  buttons: MessageButtonOptions[]
-): MessageActionRow {
-  return new MessageActionRow ({
-    components: buttons.map (opts => new MessageButton (opts))
+export function ButtonRow(buttons: MessageButtonOptions[]): MessageActionRow {
+  return new MessageActionRow({
+    components: buttons.map((opts) => new MessageButton(opts)),
   })
 }
 
 //// PRIVATE //////////////////////////////////////////////////////////////////
 
-function getEmbedSelfAuthor (): MessageEmbedAuthor {
+function getEmbedSelfAuthor(): MessageEmbedAuthor {
   return {
     name: client.user!.username,
-    iconURL: client.user!.displayAvatarURL (),
+    iconURL: client.user!.displayAvatarURL(),
   }
 }
 
-function getEmbedSelfThumbnail (): MessageEmbedThumbnail {
-  return { url: client.user!.displayAvatarURL () }
+function getEmbedSelfThumbnail(): MessageEmbedThumbnail {
+  return { url: client.user!.displayAvatarURL() }
 }

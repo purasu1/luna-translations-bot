@@ -6,38 +6,38 @@ import { notifyDiscord, NotifyOptions } from './notify'
 import { frameEmitter } from './holodex/frameEmitter'
 import { DexFrame } from './holodex/frames'
 import { isMainThread } from 'worker_threads'
-import {stripIndent} from 'common-tags'
+import { stripIndent } from 'common-tags'
 
-if (isMainThread) frameEmitter.on ('frame', notifyFrame)
+if (isMainThread) frameEmitter.on('frame', notifyFrame)
 
-async function notifyFrame (frame: DexFrame): Promise<void> {
-  const streamer   = streamers.find (s => s.ytId === frame.channel.id)
-  const isRecorded = getNotifiedLives ().includes (frame.id)
-  const isNew      = streamer && !isRecorded
+async function notifyFrame(frame: DexFrame): Promise<void> {
+  const streamer = streamers.find((s) => s.ytId === frame.channel.id)
+  const isRecorded = getNotifiedLives().includes(frame.id)
+  const isNew = streamer && !isRecorded
   const mustNotify = isNew && frame.status === 'live'
 
-  if (isNew) log (`${frame.status} | ${frame.id} | ${streamer!.name}`)
-  
+  if (isNew) log(`${frame.status} | ${frame.id} | ${streamer!.name}`)
+
   if (mustNotify) {
-    notifyDiscord ({
+    notifyDiscord({
       feature: 'youtube',
       streamer: streamer as Streamer,
       embedBody: `I am live on YouTube!\nhttps://youtu.be/${frame.id}`,
       emoji: emoji.yt,
       avatarUrl: frame.channel.photo,
-      nonEmbedText: `https://youtu.be/${frame.id}`
+      nonEmbedText: `https://youtu.be/${frame.id}`,
     })
 
-    notifyDiscord (getRelayNotifyProps (frame))
+    notifyDiscord(getRelayNotifyProps(frame))
 
-    addNotifiedLive (frame.id)
+    addNotifiedLive(frame.id)
   }
 }
 
-export function getRelayNotifyProps (frame: DexFrame): NotifyOptions {
+export function getRelayNotifyProps(frame: DexFrame): NotifyOptions {
   return {
     feature: 'relay',
-    streamer: streamers.find (s => s.ytId === frame.channel.id)!,
+    streamer: streamers.find((s) => s.ytId === frame.channel.id)!,
     embedBody: stripIndent`
       I will now relay translations from live translators.
       ${frame.title}
@@ -46,6 +46,6 @@ export function getRelayNotifyProps (frame: DexFrame): NotifyOptions {
     emoji: emoji.holo,
     videoId: frame.id,
     avatarUrl: frame.channel.photo,
-    credits: true
+    credits: true,
   }
 }

@@ -8,14 +8,14 @@ export class BotData {
   @prop({ type: () => [String], default: [] })
   public notifiedYtLives: VideoId[]
 
-  @prop({ type: String, default: () => new Map () }, WhatIsIt.MAP)
+  @prop({ type: String, default: () => new Map() }, WhatIsIt.MAP)
   lastCommunityPosts: Map<YouTubeChannelId, CommunityPostURL>
 
-  @prop({ type: () => [RelayedComment], default: () => new Map () }, WhatIsIt.MAP)
+  @prop({ type: () => [RelayedComment], default: () => new Map() }, WhatIsIt.MAP)
   relayHistory: Map<VideoId, RelayedComment[]>
 }
 
-export const BotDataDb = getModelForClass (BotData)
+export const BotDataDb = getModelForClass(BotData)
 
 export type YouTubeChannelId = string
 

@@ -8,30 +8,30 @@ import { VideoId, YouTubeChannelId } from '../../../modules/holodex/frames'
 import { RelayedComment } from './RelayedComment'
 
 export class GuildData {
-  @prop ({ type: () => String })
+  @prop({ type: () => String })
   public _id: Snowflake
 
-  @prop({ type: () => String, default: () => new Map () }, WhatIsIt.MAP)
+  @prop({ type: () => String, default: () => new Map() }, WhatIsIt.MAP)
   relayNotices: Map<VideoId, Snowflake>
 
-  @prop({ type: () => [RelayedComment], default: () => new Map () }, WhatIsIt.MAP)
+  @prop({ type: () => [RelayedComment], default: () => new Map() }, WhatIsIt.MAP)
   relayHistory: Map<VideoId, RelayedComment[]>
 
-  @prop ({ type: () => BlacklistNotice, default: () => new Map () }, WhatIsIt.MAP)
+  @prop({ type: () => BlacklistNotice, default: () => new Map() }, WhatIsIt.MAP)
   blacklistNotices: Map<MessageId, BlacklistNotice>
 }
 
 export class BlacklistNotice {
-  @prop ({ type: () => String })
+  @prop({ type: () => String })
   ytId: YouTubeChannelId
 
-  @prop ({ type: () => String })
+  @prop({ type: () => String })
   videoId: VideoId
-  
-  @prop ({ type: () => String })
+
+  @prop({ type: () => String })
   originalMsgId: Snowflake
 }
 
-export const GuildDataDb = getModelForClass (GuildData)
+export const GuildDataDb = getModelForClass(GuildData)
 
 type MessageId = Snowflake

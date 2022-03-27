@@ -1,22 +1,22 @@
-import { Message } from 'discord.js'
+import { CommandInteraction } from 'discord.js'
 import { createEmbedMessage, reply } from '../../../helpers/discord'
 import { SettingToggle } from '../models/GuildSettings'
 import { getSettings, updateSettings } from './guildSettings'
 
-export function toggleSetting (props: ToggleProps): void {
-  const settings = getSettings (props.msg)
-  const current  = settings[props.setting]
-  const notice   = current === true ? props.disable : props.enable
+export function toggleSetting(props: ToggleProps): void {
+  const settings = getSettings(props.intr)
+  const current = settings[props.setting]
+  const notice = current === true ? props.disable : props.enable
 
-  updateSettings (props.msg, { [props.setting]: !current })
-  reply (props.msg, createEmbedMessage (notice))
+  updateSettings(props.intr, { [props.setting]: !current })
+  reply(props.intr, createEmbedMessage(notice))
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 interface ToggleProps {
-  msg:     Message
+  intr: CommandInteraction
   setting: SettingToggle
-  enable:  string
+  enable: string
   disable: string
 }

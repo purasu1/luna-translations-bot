@@ -1,43 +1,40 @@
-import { Command, validateRole } from '../../helpers/discord'
+import { Command } from '../../helpers/discord'
 import { oneLine } from 'common-tags'
-import { Message } from 'discord.js'
+import { CommandInteraction } from 'discord.js'
 import { validateInputAndModifyEntryList } from '../db/functions'
-import { init, last } from 'ramda'
-
-const usage = 'community <add|remove> <streamer name> <optional:roleID|mention>'
+import { notificationCommand } from '../../helpers/discord/slash'
 
 export const community: Command = {
   config: {
-    aliases:   ['comm'],
-    permLevel: 2
+    permLevel: 2,
   },
   help: {
     category: 'Notifs',
-    usage,
-    description: `
-      Starts or stops sending community post notifs in the current channel.
-    `,
+    description: `Starts or stops sending community post notifs in the current channel.`,
   },
-  callback: async (msg: Message, [verb, ...name]: string[]): Promise<void> => {
-    const role     = validateRole (msg.guild!, last (name))
-    const streamer = role ? init (name).join (' ') : name.join (' ')
-    validateInputAndModifyEntryList ({
-      msg, verb, streamer, role, usage,
+  slash: notificationCommand({ name: 'community', subject: 'community posts' }),
+  callback: (intr: CommandInteraction): void => {
+    const streamer = intr.options.getString('channel')!
+    validateInputAndModifyEntryList({
+      intr,
+      verb: intr.options.getSubcommand(true) as 'add' | 'remove' | 'clear',
+      streamer,
+      role: intr.options.getRole('role')?.id,
       feature: 'community',
       add: {
         success: `:family_mmbb: Notifying community posts by`,
         failure: oneLine`
           :warning: ${streamer}'s community posts are already being
           relayed in this channel.
-        `
+        `,
       },
       remove: {
         success: `:family_mmbb: Stopped notifying community posts by`,
         failure: oneLine`
           :warning: ${streamer}'s community posts weren't already being notified
-          in <#${msg.channel.id}>. Are you in the right channel?
+          in <#${intr.channel!.id}>. Are you in the right channel?
         `,
       },
     })
-  }
+  },
 }
