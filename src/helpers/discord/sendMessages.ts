@@ -38,11 +38,15 @@ export async function reply(
   const payload = { ...contextMenuIntrPayload, failIfNotExists: false }
 
   if (msg instanceof ContextMenuInteraction) {
-    return replyFn(contextMenuIntrPayload).catch(() => {
+    return replyFn(contextMenuIntrPayload).catch((err: any) => {
+      warn(err)
+      warn('trying to reply normally')
       msg.reply(contextMenuIntrPayload).catch(warn)
     })
   } else {
-    return replyFn(payload).catch(() => {
+    return replyFn(payload).catch((err: any) => {
+      warn(err)
+      warn('trying to reply normally')
       msg.reply(contextMenuIntrPayload).catch(warn)
     })
   }
