@@ -30,21 +30,21 @@ export async function reply(
 ): Promise<Message | Message[] | undefined | void> {
   if (!canBot('SEND_MESSAGES', msg.channel)) return
   const replyFn = msg instanceof Message ? msg.reply.bind(msg) : msg.editReply.bind(msg)
+  const contextMenuIntrPayload = {
+    ...(embed ? { embeds: isArray(embed) ? embed : [embed] } : {}),
+    ...(text ? { content: text } : {}),
+    ...(file ? { files: [file] } : {}),
+  }
+  const payload = { ...contextMenuIntrPayload, failIfNotExists: false }
+
   if (msg instanceof ContextMenuInteraction) {
-    return replyFn({
-        ...(embed ? { embeds: isArray(embed) ? embed : [embed] } : {}),
-        ...(text ? { content: text } : {}),
-        ...(file ? { files: [file] } : {}),
-      })
-      .catch(warn)
+    return replyFn(contextMenuIntrPayload).catch(() => {
+      msg.reply(contextMenuIntrPayload).catch(warn)
+    })
   } else {
-    return replyFn({
-        ...(embed ? { embeds: isArray(embed) ? embed : [embed] } : {}),
-        ...(text ? { content: text } : {}),
-        ...(file ? { files: [file] } : {}),
-        failIfNotExists: false,
-      })
-      .catch(warn)
+    return replyFn(payload).catch(() => {
+      msg.reply(contextMenuIntrPayload).catch(warn)
+    })
   }
 }
 
