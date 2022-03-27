@@ -115,6 +115,7 @@ function replyCurrent({ g, feature, intr, streamer, role, add }: ValidatedOption
     intr,
     createEmbed(
       {
+        description: 'Current',
         fields: [
           ...getEntryFields(newEntries),
         ],
