@@ -69,8 +69,9 @@ export function hasKickPerms(subject: CommandInteraction | GuildMember): boolean
 export function getGuildId(
   subject: CommandInteraction | Guild | GuildMember,
 ): Snowflake | undefined {
+  console.log(subject)
   return subject instanceof CommandInteraction
-    ? subject.guild?.id
+    ? subject.guildId ?? undefined
     : isGuild(subject)
     ? subject.id
     : subject.guild!.id
