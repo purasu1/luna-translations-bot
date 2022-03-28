@@ -83,7 +83,7 @@ function getMainHelp(categories: Set<string>, settings: GuildSettings) {
 function getCategoryFields(categories: Set<string>): Set<EmbedField> {
   return categories.map((category) => ({
     name: category,
-    value: `/help [category: ${category.toLowerCase()}]`,
+    value: `/tlhelp [category: ${category.toLowerCase()}]`,
     inline: true,
   }))
 }
