@@ -12,7 +12,7 @@ export function modifyRoleList(opts: RoleModifyOptions): void {
     remove: !isNew ? removeRole : notifyNotFound,
   })
 
-  modify(opts)
+  modify({ ...opts, g })
 }
 
 ///////////////////////////////////////////////////////////////////////////////
