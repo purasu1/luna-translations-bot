@@ -23,7 +23,7 @@ export const admins: Command = {
     modifyRoleList({
       type: 'admins',
       intr,
-      verb: intr.options.getString('verb')!,
+      verb: intr.options.getSubcommand(true),
       role: intr.options.getRole('role')!.id,
     })
   },
