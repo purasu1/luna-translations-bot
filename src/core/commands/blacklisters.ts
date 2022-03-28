@@ -21,7 +21,7 @@ export const blacklisters: Command = {
   }),
   callback: (intr: CommandInteraction): void => {
     modifyRoleList({
-      type: 'admins',
+      type: 'blacklisters',
       intr,
       verb: intr.options.getSubcommand(true),
       role: intr.options.getRole('role')!.id,

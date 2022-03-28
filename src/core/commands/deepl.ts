@@ -5,7 +5,7 @@ import { oneLine } from 'common-tags'
 import { SlashCommandBuilder } from '@discordjs/builders'
 
 const description =
-  "Toggles automatic DeepL translation for Hololive members' chat messages. (Also affects tl.holochats)"
+  "Toggles automatic DeepL translation for Hololive members' chat messages. (Also affects /cameos)"
 
 export const deepl: Command = {
   config: {
