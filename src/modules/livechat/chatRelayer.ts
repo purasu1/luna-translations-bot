@@ -83,7 +83,7 @@ tldex.on('subscribeSuccess', (msg) => {
 
 tldex.on('subscribeError', (msg) => {
   retries[msg.id] = (retries[msg.id] ?? 0) + 1
-  if (retries[msg.id] < 20) {
+  if (retries[msg.id] < 2) {
     setTimeout(() => setupLive(framesAwaitingSub[msg.id]), 30000)
   } else {
     delete retries[msg.id]
