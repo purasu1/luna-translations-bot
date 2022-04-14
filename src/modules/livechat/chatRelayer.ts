@@ -83,7 +83,7 @@ tldex.on('subscribeSuccess', (msg) => {
 
 tldex.on('subscribeError', (msg) => {
   retries[msg.id] = (retries[msg.id] ?? 0) + 1
-  if (retries[msg.id] < 2) {
+  if (retries[msg.id] < 5) {
     setTimeout(() => setupLive(framesAwaitingSub[msg.id]), 30000)
   } else {
     delete retries[msg.id]
@@ -104,7 +104,7 @@ function setupLive(frame: DexFrame) {
   tldex.emit('subscribe', { video_id: frame.id, lang: 'en' })
   ;(tldex as any).removeAllListeners?.(`${frame.id}/en`)
   tldex.on(`${frame.id}/en`, async (msg) => {
-    debug(`Received a message in ${frame.id}: ${JSON.stringify(msg)}`)
+    //debug(`Received a message in ${frame.id}: ${JSON.stringify(msg)}`)
     if (msg.name) {
       const cmt: ChatComment = {
         id: msg.channel_id ?? 'MChad-' + msg.name,
