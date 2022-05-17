@@ -166,7 +166,7 @@ export const hololive = [
       'https://yt3.ggpht.com/ytc/AAUvwnjPuFWs42Vx2yIhK7z1w4L-e1GIpHn_5R1uknbS=s800-c-k-c0x00ffffff-no-rj',
     groups: ['3rd Generation'],
     twitter: 'houshoumarine',
-    aliases: ['marine', '船長', 'senchou', 'sentyo'],
+    aliases: ['marine', '船長', 'senchou', 'sentyo', 'mari-tan', 'maripi'],
   },
   {
     name: 'Yozora Mel',
