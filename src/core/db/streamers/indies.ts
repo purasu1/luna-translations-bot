@@ -105,6 +105,15 @@ export const indies = [
     twitter: 'ui_shig',
     aliases: ['ui', 'uimama', 'ういママ'],
   },
+  {
+    name: 'Misumi no Harawata',
+    ytId: 'UC9VqnG2Yx--wWitfHvJRe9A',
+    chName: 'みすみのはらわた',
+    picture: '',
+    groups: ['indies'],
+    twitter: 'yu_ka_misumi',
+    aliases: [],
+  },
   // {
   // name: 'tam', ytId: 'UCVTRz4yxAm0m3jo_4tpEcZw',
   // chName: 'タム',
