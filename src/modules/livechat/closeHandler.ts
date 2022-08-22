@@ -10,7 +10,7 @@ import { debug, isNotNil, log } from '../../helpers'
 import { findTextChannel, send } from '../../helpers/discord'
 import { DexFrame, getFrameList, getStartTime, VideoId } from '../holodex/frames'
 import { deleteChatProcess } from './chatProcesses'
-import { findFrameThread, setupRelay } from './chatRelayer'
+import { findFrameThread, /* setupRelay */ } from './chatRelayer'
 
 export async function retryIfStillUpThenPostLog(
   frame: DexFrame,
