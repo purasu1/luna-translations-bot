@@ -16,14 +16,13 @@ import { resolve } from 'path'
 import { processComments, Task } from './chatRelayerWorker'
 import { io } from 'socket.io-client'
 import { debug, log } from '../../helpers'
-import { compose } from 'ramda'
-const Piscina = require('piscina')
+// const Piscina = require('piscina')
 
-const piscina = new Piscina({
-  filename: resolve(__dirname, 'chatRelayerWorker.js'),
-  useAtomics: false,
-  idleTimeout: 99999999,
-})
+// const piscina = new Piscina({
+  // filename: resolve(__dirname, 'chatRelayerWorker.js'),
+  // useAtomics: false,
+  // idleTimeout: 99999999,
+// })
 
 if (isMainThread)
   frameEmitter.on('frame', (frame: DexFrame) => {
@@ -39,15 +38,15 @@ if (isMainThread)
 
 const masterchats: Record<VideoId, any> = {} // Figure out why MessagePort type broken
 
-export async function setupRelay(frame: DexFrame): Promise<void> {
-  const { port1, port2 } = new MessageChannel()
+// export async function setupRelay(frame: DexFrame): Promise<void> {
+  // const { port1, port2 } = new MessageChannel()
 
-  masterchats[frame.id] = port2
+  // masterchats[frame.id] = port2
 
-  piscina.run({ port: port1, frame, allEntries }, { transferList: [port1] })
+  // piscina.run({ port: port1, frame, allEntries }, { transferList: [port1] })
 
-  port2.on('message', runTask)
-}
+  // port2.on('message', runTask)
+// }
 
 // TODO: ensure no race condition getting live frames on startup
 const framesAwaitingSub: Record<VideoId, DexFrame> = {}

@@ -202,6 +202,10 @@ function relayCameo(
     tlRelay: false,
     vId: frame.id,
     g: g,
+    save: {
+      comment: cmt,
+      frame,
+    }
   } : undefined
 }
 
