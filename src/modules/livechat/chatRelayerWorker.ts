@@ -126,6 +126,7 @@ export async function processComments(
       const deepLTl = mustDeepL ? await tl(cmt.body) : undefined
       const mustShowTl = mustDeepL && deepLTl !== cmt.body
       const maybeGossip = isStreamer_ || isTl_
+
       const entries = (entrs ?? allEntries).filter(
         ([{}, {}, f, e]) =>
           [(f === 'cameos' ? author : streamer)?.name, 'all'].includes(e.streamer) ||
@@ -141,6 +142,7 @@ export async function processComments(
         type: 'bot',
       }
 
+      let mustSave_ = mustSave
       const sendTasks = entries
         .map(([g, bl, f, e]) => {
           const getTask = match(f, {
@@ -148,6 +150,16 @@ export async function processComments(
             gossip: maybeGossip ? relayGossip : doNothing,
             relay: relayTlOrStreamerComment,
           })
+
+          ///////////////////////////////////////////////////////////////////////////////
+          // fix for blacklisting gossip tls
+          const stalked = streamers.find((s) => s.name === e.streamer)
+          const isGoss = stalked && isGossip(cmt, stalked, frame)
+          if (isGoss) {
+            mustSave_ = true
+          }
+          ///////////////////////////////////////////////////////////////////////////////
+
 
           return getTask({
             e,
@@ -162,7 +174,7 @@ export async function processComments(
         })
         .filter((x) => x !== undefined) as Task[]
 
-      return [...sendTasks, ...(mustSave ? [saveTask] : [])]
+      return [...sendTasks, ...(mustSave_ ? [saveTask] : [])]
     }),
   )
 
@@ -170,9 +182,9 @@ export async function processComments(
 }
 
 function relayCameo(
-  { discordCh, to, cmt, deepLTl, frame, g }: RelayData,
+  { discordCh, to, cmt, deepLTl, frame, g, bl }: RelayData,
   isGossip?: boolean,
-): SendMessageTask {
+): SendMessageTask | undefined {
   const cleaned = cmt.body.replaceAll('`', "'")
   const stalked = streamers.find((s) => s.ytId === cmt.id)
   const groups = stalked?.groups as string[] | undefined
@@ -182,14 +194,15 @@ function relayCameo(
   const line1 = `${emj} **${cmt.name}** in **${to}**'s chat: \`${cleaned}\``
   const line2 = mustTl ? `\n${emoji.deepl}**DeepL:** \`${deepLTl}\`` : ''
   const line3 = `\n<https://youtu.be/${frame.id}>`
-  return {
+  const mustPost = !isBlacklistedOrUnwanted(cmt, g, bl)
+  return mustPost ? {
     _tag: 'SendMessageTask',
     cid: discordCh,
     content: line1 + line2 + line3,
     tlRelay: false,
     vId: frame.id,
     g: g,
-  }
+  } : undefined
 }
 
 function relayGossip(data: RelayData): SendMessageTask | undefined {
