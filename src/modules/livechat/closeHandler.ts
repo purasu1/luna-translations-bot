@@ -1,4 +1,4 @@
-import { MasterchatError } from 'masterchat'
+// import { MasterchatError } from 'masterchat'
 import {
   deleteRelayHistory,
   filterAndStringifyHistory,
@@ -27,7 +27,7 @@ export async function retryIfStillUpThenPostLog(
   setTimeout(() => delete retries[frame.id], 600000)
   if (isStillOn && retries[frame.id]?.[0] <= 15 && !isMembersOnly && !isDisabled && errorCode) {
     debug(`masterchat exited on ${frame.id}, trying to reconnect in 5s`)
-    setTimeout(() => setupRelay(frame), 2000)
+    //setTimeout(() => setupRelay(frame), 2000)
   } else {
     if (errorCode) {
       log(`${frame.status} ${frame.id} closed with mc error code: ${errorCode}`)
