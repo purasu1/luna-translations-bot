@@ -126,6 +126,7 @@ export async function processComments(
       const deepLTl = mustDeepL ? await tl(cmt.body) : undefined
       const mustShowTl = mustDeepL && deepLTl !== cmt.body
       const maybeGossip = isStreamer_ || isTl_
+
       const entries = (entrs ?? allEntries).filter(
         ([{}, {}, f, e]) =>
           [(f === 'cameos' ? author : streamer)?.name, 'all'].includes(e.streamer) ||
@@ -141,6 +142,7 @@ export async function processComments(
         type: 'bot',
       }
 
+      let mustSave_ = mustSave
       const sendTasks = entries
         .map(([g, bl, f, e]) => {
           const getTask = match(f, {
@@ -148,6 +150,16 @@ export async function processComments(
             gossip: maybeGossip ? relayGossip : doNothing,
             relay: relayTlOrStreamerComment,
           })
+
+          ///////////////////////////////////////////////////////////////////////////////
+          // fix for blacklisting gossip tls
+          const stalked = streamers.find((s) => s.name === e.streamer)
+          const isGoss = stalked && isGossip(cmt, stalked, frame)
+          if (isGoss) {
+            mustSave_ = true
+          }
+          ///////////////////////////////////////////////////////////////////////////////
+
 
           return getTask({
             e,
@@ -162,7 +174,7 @@ export async function processComments(
         })
         .filter((x) => x !== undefined) as Task[]
 
-      return [...sendTasks, ...(mustSave ? [saveTask] : [])]
+      return [...sendTasks, ...(mustSave_ ? [saveTask] : [])]
     }),
   )
 
