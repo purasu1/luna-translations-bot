@@ -6,7 +6,7 @@ dotenv.config({ path: __dirname + '/../../.env' })
 
 const commands = loadAllCommands()
 
-const clientId = '813040054452355114'
+const clientId = '1011817263365623898'
 // const clientId = '819785987420848128'
 // const guildId = '797780320405553223'
 
