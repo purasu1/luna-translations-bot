@@ -15,7 +15,7 @@ export const blacklist: Command = {
     category: 'Relay',
     description: oneLine`Blacklists author`,
   },
-  slash: new ContextMenuCommandBuilder().setName('blacklist').setType(3), // message
+  slash: new ContextMenuCommandBuilder().setName('blacklist').setType(3).setDefaultMemberPermissions(1), // message
   callback: async (intr: CommandInteraction): Promise<void> => {
     if (!intr.isMessageContextMenu()) {
       warn('Something very weird happened.')
