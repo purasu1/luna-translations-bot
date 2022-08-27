@@ -69,7 +69,7 @@ function getCategoryHelp(category: string) {
 function getMainHelp(categories: Set<string>, settings: GuildSettings) {
   return createEmbed(
     {
-      description: ':candy: I am the Cutest Genius Sexy Beautiful Professor! :candy:',
+      description: 'Nyahallo~',
       fields: [
         ...getCategoryFields(categories),
         getSettingsField(settings),
