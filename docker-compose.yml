@@ -4,13 +4,19 @@ services:
   bot:
     build: .
     environment:
+      DISCORD_DEV_TOKEN: ${DISCORD_DEV_TOKEN}
       DISCORD_PROD_TOKEN: ${DISCORD_PROD_TOKEN}
+      HOLODEX_API_KEY: ${HOLODEX_API_KEY}
       DEEPL_KEY: ${DEEPL_KEY}
       MONGODB_URL: mongodb://db/luna
     depends_on:
       - db
+    volumes:
+      - ./data/sqlite:/app/data
+    restart: unless-stopped
 
   db:
     image: mongo:5
     volumes:
       - ./data/mongo:/data/db
+    restart: unless-stopped
