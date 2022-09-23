@@ -309,6 +309,16 @@ export const hololive = [
     aliases: ['kiara', 'tenchou', 'きあら', 'キアラ', '店長'],
   },
   {
+    name: 'Takanashi Kiara SubCh',
+    ytId: 'UCq4ky2drohLT7W0DmDEw1dQ',
+    chName: 'Takanashi Kiara SubCh.',
+    picture:
+      'https://yt3.ggpht.com/ytc/AAUvwnh1s1xECXk9_DaR77i4LBBWkTY-nOi_O0-fPoX8=s800-c-k-c0x00ffffff-no-rj',
+    groups: ['English 1st Gen'],
+    twitter: 'takanashikiara',
+    aliases: [],
+  },
+  {
     name: 'Omaru Polka',
     ytId: 'UCK9V2B22uJYu3N7eR_BT9QA',
     chName: 'Polka Ch. 尾丸ポルカ',
