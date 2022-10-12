@@ -125,6 +125,7 @@ export function getGuildData(g: Guild | Snowflake): GuildData {
 }
 
 export function clearOldData(): void {
+  console.log('clearing old data...')
   const now = new Date().getTime()
   const WEEK = 7 * 24 * 60 * 60 * 1000
   const isRecentHist = (v: RelayedComment[]) =>

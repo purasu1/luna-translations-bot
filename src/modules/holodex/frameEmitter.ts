@@ -18,6 +18,7 @@ async function continuouslyEmitNewFrames(
   emitter: EventEmitter,
   previousFrames: DexFrame[] = [],
 ): Promise<void> {
+  console.log('getting frames...')
   const allFrames = await getFrameList()
   console.log('got frames!')
   const newFrames = removeDupeObjects(

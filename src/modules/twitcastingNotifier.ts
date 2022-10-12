@@ -12,6 +12,7 @@ const { twitcastingId, twitcastingSecret } = config
 if (isMainThread) initTwitcast()
 
 function initTwitcast(): void {
+  console.log('initiating twitcast')
   const socket = new WebSocket(
     `wss://${twitcastingId}:${twitcastingSecret}@realtime.twitcasting.tv/lives`,
   )

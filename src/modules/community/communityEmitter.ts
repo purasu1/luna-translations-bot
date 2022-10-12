@@ -20,6 +20,7 @@ function CommunityEmitter(): EventEmitter {
 }
 
 async function continuouslyEmitNewPosts(emitter: EventEmitter): Promise<void> {
+  console.log('checking for new community posts')
   const allSettings = getAllSettings()
   const subs = removeDupes(
     allSettings
