@@ -17,8 +17,8 @@ export async function ready() {
     console.log('chatrelayer')
     import('../../modules/livechat/chatRelayer')
 
-    setInterval(clearOldData, 24 * 60 * 60 * 100)
-    clearOldData()
-    clearOldBotData()
+    // setInterval(clearOldData, 24 * 60 * 60 * 100)
+    // clearOldData()
+    // clearOldBotData()
   }
 }
