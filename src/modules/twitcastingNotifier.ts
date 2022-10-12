@@ -21,7 +21,7 @@ function initTwitcast(): void {
     socket.close()
   })
   socket.on('close', (...args) => {
-    console.log('twitcast closed: ' JSON.stringify(args))
+    console.log('twitcast closed: ', JSON.stringify(args))
     initTwitcast()
   })
   socket.on('message', processMessage)
