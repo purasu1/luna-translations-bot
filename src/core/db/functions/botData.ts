@@ -47,11 +47,13 @@ export async function addToBotRelayHistory(videoId: VideoId, cmt: RelayedComment
 }
 
 export async function clearOldBotData() {
+  console.log('clearing old bot data...')
   const history = (await getBotData()).relayHistory
   console.log(`history len is ${history.size}`)
   const newHistory = filter(history, (v, k) => v[0].absoluteTime > Date.now() - 86400000)
   console.log(`new his len ${newHistory.size}`)
   updateBotData({ relayHistory: newHistory })
+  console.log('done clearing')
 }
 
 ///////////////////////////////////////////////////////////////////////////////

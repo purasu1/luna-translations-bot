@@ -143,6 +143,7 @@ export function clearOldData(): void {
     updateGuildData(guildData._id, { relayHistory: newRelayHistory })
     updateGuildData(guildData._id, { blacklistNotices: newBlacklistNotices })
   })
+  console.log('done clearing')
 }
 
 export function deleteGuildData(g: Snowflake): void {
