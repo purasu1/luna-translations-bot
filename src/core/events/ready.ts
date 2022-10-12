@@ -6,7 +6,7 @@ import { isMainThread } from 'worker_threads'
 
 export async function ready() {
   log(`${client.user!.tag} serving ${client.guilds.cache.size} servers.`)
-  client.user!.setActivity(`MAINTENANCE, NO RELAY`, { type: 'PLAYING' })
+  client.user!.setActivity(`DAILY MAINTENANCES (DEBUGGING)`, { type: 'PLAYING' })
   if (isMainThread) {
     console.log('community notifier...')
     import('../../modules/community/communityNotifier')

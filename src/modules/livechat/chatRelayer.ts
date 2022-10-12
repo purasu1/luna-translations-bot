@@ -223,11 +223,11 @@ function runTask(task: Task): void {
     
     ({ ch, thread });
     // DISABLED 2022-10-12
-    // send(thread ?? ch, task.content).then((msg) => {
-      // if (task.save && msg) {
-        // saveComment(task.save.comment, task.save.frame, 'guild', msg.id, msg.channelId, task.g._id)
-      // }
-    // })
+    send(thread ?? ch, task.content).then((msg) => {
+      if (task.save && msg) {
+        saveComment(task.save.comment, task.save.frame, 'guild', msg.id, msg.channelId, task.g._id)
+      }
+    })
     // }
   }
 }
