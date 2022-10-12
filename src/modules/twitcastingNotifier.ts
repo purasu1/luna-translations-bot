@@ -43,7 +43,8 @@ function processPayloadEntry(message: any): TwitcastingLive {
 }
 
 async function notifyLive(live: TwitcastingLive, settings: GuildSettings[]): Promise<void> {
-  return notifyDiscord({
+  console.log('notifying twitcasts')
+  const result = notifyDiscord({
     avatarUrl: '',
     subbedGuilds: settings.filter((g) => isRelaying(g, live.name)),
     feature: 'twitcasting',
@@ -54,6 +55,8 @@ async function notifyLive(live: TwitcastingLive, settings: GuildSettings[]): Pro
       https://twitcasting.tv/${live.name}/movie/${live.movieId}
     `,
   })
+  console.log('done notifying twitcasts')
+  return result
 }
 
 function isRelaying(guild: GuildSettings, streamer: TwitterName): boolean {
