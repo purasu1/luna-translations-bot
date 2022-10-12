@@ -141,12 +141,12 @@ export async function clearOldData(): Promise<void> {
     const newRelayHistory = filter(guildData.relayHistory, isRecentHist)
     console.log('finished computing new stuff')
 
-    console.log('updating guild data 1/3')
-    updateGuildData(guildData._id, { relayNotices: newRelayNotices })
-    console.log('updating guild data 2/3')
-    updateGuildData(guildData._id, { relayHistory: newRelayHistory })
-    console.log('updating guild data 3/3')
-    updateGuildData(guildData._id, { blacklistNotices: newBlacklistNotices })
+    console.log('updating guild data 1/1')
+    updateGuildData(guildData._id, {
+      relayNotices: newRelayNotices,
+      relayHistory: newRelayHistory,
+      blacklistNotices: newBlacklistNotices,
+    })
     console.log('done with guild ' + g.id)
   })
   console.log('done clearing')
