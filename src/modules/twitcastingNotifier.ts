@@ -20,6 +20,10 @@ function initTwitcast(): void {
     console.log('TWITCAST SOCKET CLOSED: ', JSON.stringify(args))
     socket.close()
   })
+  socket.onerror = (...args) => {
+    console.log('[2]TWITCAST SOCKET CLOSED: ', JSON.stringify(args))
+    socket.close()
+  }
   socket.on('close', (...args) => {
     console.log('twitcast closed: ', JSON.stringify(args))
     initTwitcast()
