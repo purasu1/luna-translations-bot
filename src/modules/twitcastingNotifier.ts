@@ -31,7 +31,9 @@ async function processMessage(data: any): Promise<void> {
   const json = tryOrLog(() => JSON.parse(data as string))
   const lives = json?.movies?.map(processPayloadEntry) as any[]
   const settings = getAllSettings()
+  console.log('notifying twitcasts')
   lives?.forEach((live) => notifyLive(live, settings))
+  console.log('done notifying twitcasts')
 }
 
 function processPayloadEntry(message: any): TwitcastingLive {
@@ -42,7 +44,6 @@ function processPayloadEntry(message: any): TwitcastingLive {
 }
 
 async function notifyLive(live: TwitcastingLive, settings: GuildSettings[]): Promise<void> {
-  console.log('notifying twitcasts')
   const result = notifyDiscord({
     avatarUrl: '',
     subbedGuilds: settings.filter((g) => isRelaying(g, live.name)),
@@ -54,7 +55,6 @@ async function notifyLive(live: TwitcastingLive, settings: GuildSettings[]): Pro
       https://twitcasting.tv/${live.name}/movie/${live.movieId}
     `,
   })
-  console.log('done notifying twitcasts')
   return result
 }
 
