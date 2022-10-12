@@ -19,6 +19,7 @@ async function continuouslyEmitNewFrames(
   previousFrames: DexFrame[] = [],
 ): Promise<void> {
   const allFrames = await getFrameList()
+  console.log('got frames!')
   const newFrames = removeDupeObjects(
     allFrames?.filter(
       (frame) => isNew(frame, previousFrames) && !isFreeChat(frame) && isPublic(frame),

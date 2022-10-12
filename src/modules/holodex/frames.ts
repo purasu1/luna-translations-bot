@@ -15,7 +15,9 @@ export async function getFrameList(): Promise<DexFrame[]> {
 }
 
 export async function __getFrameList(): Promise<DexFrame[]> {
+  debug('getting frames start')
   const attempt = await _getFrameList()
+  debug('getting frames end')
   if (attempt.length === 0) debug('Failed to get frames. restarting.')
   return attempt.length === 0 ? getFrameList() : attempt
 }

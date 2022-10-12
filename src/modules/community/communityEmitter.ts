@@ -37,7 +37,9 @@ async function continuouslyEmitNewPosts(emitter: EventEmitter): Promise<void> {
 
 async function checkChannel(ytId: string, emitter: EventEmitter): Promise<void> {
   const notified = getNotifiedCommunityPosts()
+  console.log('getting community post for ' + ytId)
   const post = await getLatestPost(ytId)
+  console.log('got community post: ' + post?.url)
   const mustEmit = post && !notified.includes(post.url) && post.isToday
 
   if (mustEmit) {
