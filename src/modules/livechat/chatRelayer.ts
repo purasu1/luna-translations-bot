@@ -184,7 +184,7 @@ function runTask(task: Task): void {
     const ch = findTextChannel(task.cid)
     const thread = task.tlRelay ? findFrameThread(task.vId, task.g) : null
 
-    log(`${task.vId} | ${task.content}`)
+    log(`[MESSAGE NOT SENT (DEBUG MODE)] ${task.vId} | ${task.content}`)
     // const lastMsg = ch?.lastMessage
     // const isBotLastPoster = lastMsg?.author?.id === client.user?.id
     // // // this code is ugly and duplicated but im in a hurry
@@ -220,11 +220,14 @@ function runTask(task: Task): void {
     // })
     // })
     // } else {
-    send(thread ?? ch, task.content).then((msg) => {
-      if (task.save && msg) {
-        saveComment(task.save.comment, task.save.frame, 'guild', msg.id, msg.channelId, task.g._id)
-      }
-    })
+    
+    ({ ch, thread });
+    // DISABLED 2022-10-12
+    // send(thread ?? ch, task.content).then((msg) => {
+      // if (task.save && msg) {
+        // saveComment(task.save.comment, task.save.frame, 'guild', msg.id, msg.channelId, task.g._id)
+      // }
+    // })
     // }
   }
 }
