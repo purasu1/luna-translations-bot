@@ -28,7 +28,6 @@ function initTwitcast(): void {
 }
 
 async function processMessage(data: any): Promise<void> {
-  console.log('twitcasting message: '+ JSON.stringify(data))
   const json = tryOrLog(() => JSON.parse(data as string))
   const lives = json?.movies?.map(processPayloadEntry) as any[]
   const settings = getAllSettings()
