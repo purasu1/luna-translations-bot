@@ -16,8 +16,14 @@ function initTwitcast(): void {
   const socket = new WebSocket(
     `wss://${twitcastingId}:${twitcastingSecret}@realtime.twitcasting.tv/lives`,
   )
-  socket.on('error', socket.close)
-  socket.on('close', initTwitcast)
+  socket.on('error', (...args) => {
+    console.log('TWITCAST SOCKET CLOSED: ', JSON.stringify(args))
+    socket.close()
+  })
+  socket.on('close', (...args) => {
+    console.log('twitcast closed: ' JSON.stringify(args))
+    initTwitcast()
+  })
   socket.on('message', processMessage)
 }
 
