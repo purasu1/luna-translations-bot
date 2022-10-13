@@ -65,10 +65,12 @@ export function addToGuildRelayHistory(
   cmt: RelayedComment,
   g: Guild | Snowflake,
 ): void {
+  console.log('adding to guild relay history...')
   const history = getGuildData(g).relayHistory
   const cmts = history.get(videoId) ?? []
   const newHistory = setKey(videoId, [...cmts, cmt])(history)
   updateGuildData(g, { relayHistory: newHistory })
+  console.log('...done adding to guild relay history')
 }
 
 export function deleteRelayHistory(videoId: VideoId, g: Guild | Snowflake): void {

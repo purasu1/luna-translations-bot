@@ -40,10 +40,12 @@ export async function getRelayHistory(videoId?: VideoId): Promise<RelayedComment
 }
 
 export async function addToBotRelayHistory(videoId: VideoId, cmt: RelayedComment): Promise<void> {
+  console.log('adding to bot relay history...')
   const history = (await getBotData()).relayHistory
   const cmts = history.get(videoId) ?? []
   const newHistory = setKey(videoId, [...cmts, cmt])(history)
   updateBotData({ relayHistory: newHistory })
+  console.log('done adding to bot relay history')
 }
 
 export async function clearOldBotData() {
