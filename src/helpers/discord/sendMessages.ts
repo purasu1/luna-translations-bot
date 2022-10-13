@@ -56,9 +56,16 @@ export async function send(
   channel: TextBasedChannel | undefined,
   content: string | MessageOptions | MessagePayload,
 ): Promise<Message | undefined> {
-  return canBot('SEND_MESSAGES', channel)
-    ? channel!.send(content).catch((e) => warn(`${channel!.id} ${e}`))
-    : undefined
+  console.log('checking perms..')
+  if (canBot('SEND_MESSAGES', channel)) {
+    console.log('done checking perms, now sending...')
+    return channel!.send(content)
+      .then((msg) => {
+        console.log('finished sending.')
+        return msg
+      })
+      .catch((e) => warn(`${channel!.id} ${e}`))
+  }
 }
 
 export function createEmbedMessage(body: string, fancy: boolean = false): MessageEmbed {

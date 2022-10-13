@@ -257,6 +257,7 @@ function saveComment(
   const timestamp = !frame.start_actual
     ? 'prechat'
     : new Date(loggedTime - startTime).toISOString().substr(11, 8)
+  console.log('saving comment...')
   addFn(
     frame.id,
     {
@@ -271,4 +272,5 @@ function saveComment(
     },
     gid!,
   )
+  console.log('saving comment finished')
 }
