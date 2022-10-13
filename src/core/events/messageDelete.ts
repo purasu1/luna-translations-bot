@@ -11,8 +11,8 @@ import { doNothing, log } from '../../helpers'
 import { oneLine } from 'common-tags'
 import { RelayedComment } from '../db/models/RelayedComment'
 
-export function messageDelete(msg: Message): void {
-  const [vidId, culprit] = findVidIdAndCulpritByMsgId(msg.guild, msg.id)
+export async function messageDelete(msg: Message): Promise<void> {
+  const [vidId, culprit] = await findVidIdAndCulpritByMsgId(msg.guild, msg.id)
   const isNew = msg.guild && !isBlacklisted(culprit?.ytId, msg.guild!.id)
   const callback = culprit && isNew ? blacklistAndNotify : doNothing
 

@@ -44,7 +44,7 @@ export async function retryIfStillUpThenPostLog(
 const retries: Record<VideoId, [number, string]> = {}
 
 export async function sendAndForgetHistory(videoId: VideoId): Promise<void> {
-  const relevantHistories = getAllRelayHistories()
+  const relevantHistories = (await getAllRelayHistories())
     .map((history) => history.get(videoId))
     .filter(isNotNil)
 
@@ -52,7 +52,7 @@ export async function sendAndForgetHistory(videoId: VideoId): Promise<void> {
     const g = getSettings(gid)
     const setCh = findTextChannel(g.logChannel)
     const ch = findTextChannel(history[0].discordCh!)
-    const thread = findFrameThread(videoId, g, ch)
+    const thread = await findFrameThread(videoId, g, ch)
     const start = await getStartTime(videoId)
     const tlLog = filterAndStringifyHistory(gid, history, start)
 

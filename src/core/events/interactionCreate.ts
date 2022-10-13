@@ -73,8 +73,8 @@ function findCommand(cmd?: string): Command | undefined {
   return isNil(cmd) ? undefined : commands.get(cmd)
 }
 
-function processButton(btn: ButtonInteraction): void {
-  const notice = getNoticeFromMsgId(btn.guild!, btn.message.id)
+async function processButton(btn: ButtonInteraction): Promise<void> {
+  const notice = await getNoticeFromMsgId(btn.guild!, btn.message.id)
   const btnHandler = notice
     ? match(btn.customId, {
         cancel: cancelBlacklisting,
@@ -121,8 +121,8 @@ async function cancelBlacklistingAndExcludeLine(
   )
 }
 
-function clearAuthorTls(btn: ButtonInteraction, notice: BlacklistNotice): void {
-  const vidLog = getGuildRelayHistory(btn.guild!, notice.videoId)
+async function clearAuthorTls(btn: ButtonInteraction, notice: BlacklistNotice): Promise<void> {
+  const vidLog = await getGuildRelayHistory(btn.guild!, notice.videoId)
   const cmts = vidLog.filter((cmt) => cmt.ytId === notice.ytId)
   const msgs = <Snowflake[]>cmts.map((cmt) => cmt.msgId).filter(isNotNil)
   const ch = findTextChannel(last(cmts)?.discordCh ?? '')

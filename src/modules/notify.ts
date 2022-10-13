@@ -18,7 +18,7 @@ export async function notifyOneGuild(g: GuildSettings, opts: NotifyOptions): Pro
 
   const entries = g[feature].filter((ent) => ent.streamer == streamer!.name)
   const guildObj = client.guilds.cache.find((guild) => guild.id === g._id)
-  const notices = getRelayNotices(g._id)
+  const notices = await getRelayNotices(g._id)
   const announce = notices.get(opts.videoId ?? '')
 
   return !announce

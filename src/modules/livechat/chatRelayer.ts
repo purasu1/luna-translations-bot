@@ -167,7 +167,7 @@ setInterval(updateEntries, 10000)
 
 updateEntries()
 
-function runTask(task: Task): void {
+async function runTask(task: Task): Promise<void> {
   if (task._tag === 'EndTask') {
     delete masterchats[task.frame.id]
     if (!task.wentLive) retryIfStillUpThenPostLog(task.frame, task.errorCode)
@@ -182,7 +182,7 @@ function runTask(task: Task): void {
   }
   if (task._tag === 'SendMessageTask') {
     const ch = findTextChannel(task.cid)
-    const thread = task.tlRelay ? findFrameThread(task.vId, task.g) : null
+    const thread = task.tlRelay ? await findFrameThread(task.vId, task.g) : null
 
     log(`[MESSAGE NOT SENT (DEBUG MODE)] ${task.vId} | ${task.content}`);
     // const lastMsg = ch?.lastMessage
@@ -232,12 +232,12 @@ function runTask(task: Task): void {
   }
 }
 
-export function findFrameThread(
+export async function findFrameThread(
   videoId: VideoId,
   g: GuildSettings,
   channel?: TextChannel | ThreadChannel,
-): ThreadChannel | undefined {
-  const gdata = getGuildData(g._id)
+): Promise<ThreadChannel | undefined> {
+  const gdata = await getGuildData(g._id)
   const notice = gdata.relayNotices.get(videoId)
   const validch = channel as TextChannel
   if (g.threads) return validch?.threads?.cache.find((thr) => thr.id === notice)

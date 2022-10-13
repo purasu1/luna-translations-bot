@@ -28,10 +28,10 @@ export const blacklist: Command = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-function blacklistTl(intr: ContextMenuInteraction, reason: string): void {
+async function blacklistTl(intr: ContextMenuInteraction, reason: string): Promise<void> {
   const settings = getSettings(intr.guild!)
   const refId = intr.targetId
-  const history = getFlatGuildRelayHistory(intr.guild!)
+  const history = await getFlatGuildRelayHistory(intr.guild!)
   const culprit = history.find((cmt) => cmt.msgId === refId)
   const duplicate = culprit && isBlacklisted(culprit.ytId, settings)
   const callback = duplicate
