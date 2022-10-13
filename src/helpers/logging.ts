@@ -35,6 +35,7 @@ function logger<T>(category: string, data: T): T {
 
   console.log(`${timeHHMM} ${label} ${data}`)
   logFile.write(`${category} | ${timeYYYYMMDD} ${timeHHMM} | ${data}\n`)
+  logFile.close()
 
   return data
 }
