@@ -1,8 +1,8 @@
 import { Command, createEmbedMessage, reply } from '../../helpers/discord'
 import { oneLine } from 'common-tags'
 import { getSettings, updateSettings, removeBlacklisted } from '../db/functions'
-import { CommandInteraction, Message } from 'discord.js'
-import { head, init, last, isEmpty, isNil } from 'ramda'
+import { ChatInputCommandInteraction } from 'discord.js'
+import { init, last, isNil } from 'ramda'
 import { SlashCommandBuilder } from '@discordjs/builders'
 
 const description =
@@ -20,7 +20,7 @@ export const unblacklist: Command = {
     .setName('unblacklist')
     .setDescription(description)
     .addStringOption((option) => option.setName('ytchannelid').setDescription('YT Channel ID')),
-  callback: (intr: CommandInteraction): void => {
+  callback: (intr: ChatInputCommandInteraction): void => {
     const ytChannel = intr.options.getString('ytchannelid')
     const processMsg = isNil(ytChannel) ? unblacklistLastItem : unblacklistItem
     processMsg(intr, ytChannel!)
@@ -29,7 +29,7 @@ export const unblacklist: Command = {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-function unblacklistLastItem(intr: CommandInteraction): void {
+function unblacklistLastItem(intr: ChatInputCommandInteraction): void {
   const { blacklist } = getSettings(intr)
   const lastBlacklisted = last(blacklist)
   const replyContent = lastBlacklisted
@@ -43,7 +43,7 @@ function unblacklistLastItem(intr: CommandInteraction): void {
   if (lastBlacklisted) updateSettings(intr, { blacklist: init(blacklist) })
 }
 
-function unblacklistItem(intr: CommandInteraction, ytId: string): void {
+function unblacklistItem(intr: ChatInputCommandInteraction, ytId: string): void {
   const success = removeBlacklisted(intr.guild!, ytId)
   reply(
     intr,

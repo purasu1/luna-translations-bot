@@ -2,33 +2,31 @@ import merge from 'ts-deepmerge'
 import { client } from '../../core/'
 import {
   Message,
-  MessageAttachment,
-  MessageEmbed,
-  MessageEmbedAuthor,
-  MessageEmbedOptions,
-  MessageEmbedThumbnail,
-  MessageOptions,
+  AttachmentBuilder,
+  EmbedBuilder,
+  EmbedData,
+  MessageCreateOptions,
   MessagePayload,
   TextBasedChannel,
   EmojiIdentifierResolvable,
   MessageReaction,
-  MessageButtonOptions,
-  MessageButton,
-  MessageActionRow,
+  ButtonBuilder,
+  ActionRowBuilder,
   CommandInteraction,
-  ContextMenuInteraction,
+  ThreadChannel,
+  ContextMenuCommandInteraction,
 } from 'discord.js'
 import { warn } from '../logging'
 import { canBot } from './general'
 const { isArray } = Array
 
 export async function reply(
-  msg: Message | CommandInteraction | ContextMenuInteraction,
-  embed?: MessageEmbed | MessageEmbed[],
+  msg: Message | CommandInteraction | ContextMenuCommandInteraction,
+  embed?: EmbedBuilder | EmbedBuilder[],
   text?: string,
-  file?: MessageAttachment,
+  file?: AttachmentBuilder,
 ): Promise<Message | Message[] | undefined | void> {
-  if (!canBot('SEND_MESSAGES', msg.channel)) return
+  if (!canBot('SendMessages', msg.channel)) return
   const replyFn = msg instanceof Message ? msg.reply.bind(msg) : msg.editReply.bind(msg)
   const contextMenuIntrPayload = {
     ...(embed ? { embeds: isArray(embed) ? embed : [embed] } : {}),
@@ -37,7 +35,7 @@ export async function reply(
   }
   const payload = { ...contextMenuIntrPayload, failIfNotExists: false }
 
-  if (msg instanceof ContextMenuInteraction) {
+  if (msg instanceof ContextMenuCommandInteraction) {
     return replyFn(contextMenuIntrPayload).catch((err: any) => {
       warn(err)
       warn('trying to reply normally')
@@ -53,11 +51,11 @@ export async function reply(
 }
 
 export async function send(
-  channel: TextBasedChannel | undefined,
-  content: string | MessageOptions | MessagePayload,
+  channel: TextBasedChannel | ThreadChannel | undefined,
+  content: string | MessageCreateOptions | MessagePayload,
 ): Promise<Message | undefined> {
   console.log('checking perms..')
-  if (canBot('SEND_MESSAGES', channel)) {
+  if (canBot('SendMessages', channel)) {
     console.log('done checking perms, now sending...')
     return channel!.send(content)
       .then((msg) => {
@@ -68,7 +66,7 @@ export async function send(
   }
 }
 
-export function createEmbedMessage(body: string, fancy: boolean = false): MessageEmbed {
+export function createEmbedMessage(body: string, fancy: boolean = false): EmbedBuilder {
   return createEmbed({
     author: fancy ? getEmbedSelfAuthor() : undefined,
     thumbnail: fancy ? getEmbedSelfThumbnail() : undefined,
@@ -77,45 +75,45 @@ export function createEmbedMessage(body: string, fancy: boolean = false): Messag
 }
 
 export function createEmbed(
-  options: Partial<MessageEmbedOptions>,
+  options: Partial<EmbedData>,
   fancy: boolean = false,
-): MessageEmbed {
-  const base: Partial<MessageEmbedOptions> = {
+): EmbedBuilder {
+  const base: Partial<EmbedData> = {
     author: fancy ? getEmbedSelfAuthor() : undefined,
-    color: '#8e4497',
+    color: 9323671,
     thumbnail: fancy ? getEmbedSelfThumbnail() : undefined,
   }
-  return new MessageEmbed(merge(base, options))
+  return new EmbedBuilder(merge(base, options))
 }
 
-export function createTxtEmbed(title: string, content: string): MessageAttachment {
-  return new MessageAttachment(Buffer.from(content, 'utf-8'), title)
+export function createTxtEmbed(title: string, content: string): AttachmentBuilder {
+  return new AttachmentBuilder(Buffer.from(content, 'utf-8')).setName(title)
 }
 
 export async function react(
   msg: Message | undefined,
   emj: EmojiIdentifierResolvable,
 ): Promise<MessageReaction | undefined> {
-  if (canBot('ADD_REACTIONS', msg?.channel)) {
+  if (canBot('AddReactions', msg?.channel)) {
     return msg?.react(emj)
   }
 }
 
-export function ButtonRow(buttons: MessageButtonOptions[]): MessageActionRow {
-  return new MessageActionRow({
-    components: buttons.map((opts) => new MessageButton(opts)),
+export function ButtonRow(buttons: { label: string, customId: string, style: number }[]): ActionRowBuilder {
+  return new ActionRowBuilder({
+    components: buttons.map((opts) => new ButtonBuilder(opts)),
   })
 }
 
 //// PRIVATE //////////////////////////////////////////////////////////////////
 
-function getEmbedSelfAuthor(): MessageEmbedAuthor {
+function getEmbedSelfAuthor(): { name: string, iconURL: string } {
   return {
     name: client.user!.username,
     iconURL: client.user!.displayAvatarURL(),
   }
 }
 
-function getEmbedSelfThumbnail(): MessageEmbedThumbnail {
+function getEmbedSelfThumbnail(): { url: string } {
   return { url: client.user!.displayAvatarURL() }
 }

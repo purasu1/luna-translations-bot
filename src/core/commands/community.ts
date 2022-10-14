@@ -1,6 +1,6 @@
 import { Command } from '../../helpers/discord'
 import { oneLine } from 'common-tags'
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import { validateInputAndModifyEntryList } from '../db/functions'
 import { notificationCommand } from '../../helpers/discord/slash'
 
@@ -13,7 +13,7 @@ export const community: Command = {
     description: `Starts or stops sending community post notifs in the current channel.`,
   },
   slash: notificationCommand({ name: 'community', subject: 'community posts' }),
-  callback: (intr: CommandInteraction): void => {
+  callback: (intr: ChatInputCommandInteraction): void => {
     const streamer = intr.options.getString('channel')!
     validateInputAndModifyEntryList({
       intr,

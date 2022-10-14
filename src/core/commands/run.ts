@@ -1,5 +1,5 @@
 import { Command } from '../../helpers/discord'
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import { inspect } from 'util'
 import { config } from '../../config'
 import { client } from '../lunaBotClient' // for eval scope
@@ -20,7 +20,7 @@ export const run: Command = {
     .setName('run')
     .setDescription('run')
     .addStringOption((option) => option.setName('code').setDescription('code').setRequired(true)),
-  callback: async (intr: CommandInteraction): Promise<void> => {
+  callback: async (intr: ChatInputCommandInteraction): Promise<void> => {
     const output = await processCode(intr, intr.options.getString('code')!)
     reply(intr, undefined, '```js\n' + output + '\n```')
   },
@@ -28,7 +28,7 @@ export const run: Command = {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-async function processCode(intr: CommandInteraction, code: string): Promise<string> {
+async function processCode(intr: ChatInputCommandInteraction, code: string): Promise<string> {
   // keep imports in eval scope via _
   const _ = { client, intr, getSettings, updateSettings, getGuildData, updateGuildData }
   const evaled = await tryOrDefault(() => eval(code), '')

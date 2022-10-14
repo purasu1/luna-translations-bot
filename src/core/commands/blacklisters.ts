@@ -1,5 +1,5 @@
 import { Command } from '../../helpers/discord'
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import { modifyRoleList } from '../db/functions/roles'
 import { roleListCommand } from '../../helpers/discord/slash'
 
@@ -19,7 +19,7 @@ export const blacklisters: Command = {
     description,
     roleListName: 'the bot blacklister list',
   }),
-  callback: (intr: CommandInteraction): void => {
+  callback: (intr: ChatInputCommandInteraction): void => {
     modifyRoleList({
       type: 'blacklisters',
       intr,

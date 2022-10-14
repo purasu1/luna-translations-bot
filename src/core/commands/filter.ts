@@ -1,6 +1,6 @@
 import { Command, createEmbed, reply } from '../../helpers/discord'
 import { getSettings, updateSettings } from '../db/functions'
-import { CommandInteraction, EmbedFieldData } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import { oneLine } from 'common-tags'
 import { GuildSettings } from '../db/models'
 import { SlashCommandBuilder } from '@discordjs/builders'
@@ -34,7 +34,7 @@ export const filter: Command = {
           option.setName('pattern').setDescription('pattern').setRequired(true),
         ),
     ),
-  callback: (intr: CommandInteraction): void => {
+  callback: (intr: ChatInputCommandInteraction): void => {
     const str = intr.options.getString('pattern')!
     const g = getSettings(intr)
     const feature = 'customBannedPatterns'
@@ -62,7 +62,7 @@ type ValidList = typeof validLists[number]
 type ValidVerb = typeof validVerbs[number]
 
 interface ModifyPatternListOptions {
-  intr: CommandInteraction
+  intr: ChatInputCommandInteraction
   type: ValidList
   verb: ValidVerb
   pattern: string
@@ -115,7 +115,7 @@ function notifyInvalidPattern(opts: ModifyPatternListOptions): void {
   )
 }
 
-function createListFields(whitelist: string[], blacklist: string[]): EmbedFieldData[] {
+function createListFields(whitelist: string[], blacklist: string[]): { name: string, value: string, inline: boolean }[] {
   return [
     {
       name: 'Current whitelist',

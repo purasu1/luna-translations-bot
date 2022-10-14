@@ -29,7 +29,7 @@
     "common-tags": "^1.8.0",
     "cross-spawn": "^7.0.3",
     "discord-api-types": "^0.30.0",
-    "discord.js": "^13.6.0",
+    "discord.js": "^14.6.0",
     "dotenv": "^10.0.0",
     "enmap": "^5.8.7",
     "fp-ts": "^2.10.5",

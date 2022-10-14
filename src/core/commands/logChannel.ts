@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
-import { CommandInteraction, Snowflake } from 'discord.js'
+import { ChatInputCommandInteraction, Snowflake } from 'discord.js'
 import { Command, createEmbedMessage, reply } from '../../helpers/discord'
 import { updateSettings } from '../db/functions'
 
@@ -17,7 +17,7 @@ export const logChannel: Command = {
     .setName('logchannel')
     .setDescription(description)
     .addChannelOption((option) => option.setName('channel').setDescription('discord channel')),
-  callback: async (intr: CommandInteraction): Promise<void> => {
+  callback: async (intr: ChatInputCommandInteraction): Promise<void> => {
     const channel = intr.options.getChannel('channel')
     // const channelMention = intr.options.getChannel('channel')
     const channelId = channel?.id
@@ -31,16 +31,16 @@ export const logChannel: Command = {
   },
 }
 
-function clearSetting(intr: CommandInteraction): void {
+function clearSetting(intr: ChatInputCommandInteraction): void {
   updateSettings(intr, { logChannel: undefined })
   reply(intr, createEmbedMessage('Logs will be posted in the relay channel.'))
 }
 
-function respondInvalid(intr: CommandInteraction): void {
+function respondInvalid(intr: ChatInputCommandInteraction): void {
   reply(intr, createEmbedMessage(`Invalid channel supplied.`))
 }
 
-function setLogChannel(intr: CommandInteraction, channelId: Snowflake): void {
+function setLogChannel(intr: ChatInputCommandInteraction, channelId: Snowflake): void {
   updateSettings(intr, { logChannel: channelId })
   reply(intr, createEmbedMessage(`Logs will be posted in <#${channelId}>.`))
 }

@@ -40,7 +40,7 @@ export async function notifyOneGuild(g: GuildSettings, opts: NotifyOptions): Pro
           }).then((msg) => {
             if (msg && feature === 'relay') {
               const ch = msg.channel as TextChannel
-              const mustThread = canBot('USE_PUBLIC_THREADS', ch) && g.threads
+              const mustThread = canBot('CreatePublicThreads', ch) && g.threads
               addRelayNotice(g._id, opts.videoId!, msg.id)
               if (mustThread)
                 return tryOrLog(() =>
@@ -50,7 +50,7 @@ export async function notifyOneGuild(g: GuildSettings, opts: NotifyOptions): Pro
                     autoArchiveDuration: 1440,
                   }),
                 )?.then((thread) => {
-                  if (thread && canBot('MANAGE_MESSAGES', ch)) {
+                  if (thread && canBot('ManageMessages', ch)) {
                     tryOrLog(() => msg.pin())
                     setTimeout(() => tryOrLog(() => msg?.unpin()), 86400000)
                   }

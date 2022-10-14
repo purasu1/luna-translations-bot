@@ -5,7 +5,7 @@ import {
   SlashCommandSubcommandsOnlyBuilder,
 } from '@discordjs/builders'
 import { log } from '../../helpers'
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import { Map as ImmutableMap } from 'immutable'
 import path from 'path'
 import { isNotNil } from '../language'
@@ -42,7 +42,7 @@ export interface Command {
     | SlashCommandSubcommandsOnlyBuilder
     | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>
     | ContextMenuCommandBuilder
-  callback: (intr: CommandInteraction) => void | Promise<void>
+  callback: (intr: ChatInputCommandInteraction) => void | Promise<void>
 }
 
 //// PRIVATE //////////////////////////////////////////////////////////////////

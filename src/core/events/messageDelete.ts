@@ -58,11 +58,12 @@ function blacklistAndNotify(msg: Message, culprit: RelayedComment, vidId: VideoI
       }),
     ],
     components: [
-      ButtonRow([
-        { label: 'Cancel', customId: 'cancel', style: 2 },
-        { label: "Cancel but don't log line", customId: 'cancel2', style: 2 },
-        { label: "Clear author's TLs", customId: 'clear', style: 4 },
-      ]),
+      // FIXME
+      // ButtonRow([
+        // { label: 'Cancel', customId: 'cancel', style: 2 },
+        // { label: "Cancel but don't log line", customId: 'cancel2', style: 2 },
+        // { label: "Clear author's TLs", customId: 'clear', style: 4 },
+      //]),
     ],
   }).then((msg) =>
     addBlacklistNotice({

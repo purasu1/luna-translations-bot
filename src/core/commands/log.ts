@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import { Command, createEmbedMessage, reply, send } from '../../helpers/discord'
 import { getStartTime, VideoId } from '../../modules/holodex/frames'
 import { getRelayHistory, filterAndStringifyHistory } from '../db/functions'
@@ -19,7 +19,7 @@ export const log: Command = {
     .setName('log')
     .setDescription(description)
     .addStringOption((option) => option.setName('videoid').setDescription('Video ID').setRequired(true)),
-  callback: async (intr: CommandInteraction) => {
+  callback: async (intr: ChatInputCommandInteraction) => {
     const videoId = intr.options.getString('videoid')!
     const history = await getRelayHistory(videoId)
     const processMsg = !history ? notifyLogNotFound : sendLog
@@ -28,12 +28,12 @@ export const log: Command = {
   },
 }
 
-function notifyLogNotFound(intr: CommandInteraction, videoId: VideoId): void {
+function notifyLogNotFound(intr: ChatInputCommandInteraction, videoId: VideoId): void {
   reply(intr, createEmbedMessage(`Log not found for ${videoId}`))
 }
 
 async function sendLog(
-  intr: CommandInteraction,
+  intr: ChatInputCommandInteraction,
   videoId: VideoId,
   history: RelayedComment[],
 ): Promise<void> {

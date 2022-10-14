@@ -1,6 +1,6 @@
 import { commands } from '../lunaBotClient'
 import { getPermLevel, getSettings } from '../db/functions'
-import { CommandInteraction, EmbedField, GuildMember } from 'discord.js'
+import { ChatInputCommandInteraction, EmbedField, GuildMember } from 'discord.js'
 import { Map, Set } from 'immutable'
 import { GuildSettings, WatchFeatureSettings, WatchFeature } from '../db/models'
 import { head, isEmpty } from 'ramda'
@@ -25,7 +25,7 @@ export const tlhelp: Command = {
     .setName('tlhelp')
     .setDescription(description)
     .addStringOption((option) => option.setName('category').setDescription('category')),
-  callback: async (intr: CommandInteraction) => {
+  callback: async (intr: ChatInputCommandInteraction) => {
     const askedCategory = intr.options.getString('category') ?? ''
     const commands = await getCommandsAtUserLevel(intr)
     const categories = getCategoriesOfCommands(commands)
@@ -39,7 +39,7 @@ export const tlhelp: Command = {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-async function getCommandsAtUserLevel(intr: CommandInteraction) {
+async function getCommandsAtUserLevel(intr: ChatInputCommandInteraction) {
   const authorLevel = await getPermLevel(intr.member as GuildMember)
   return commands.filter((x) => x.config.permLevel <= authorLevel.level)
 }

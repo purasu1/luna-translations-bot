@@ -1,11 +1,10 @@
 import { Command, createEmbed, createEmbedMessage, reply } from '../../helpers/discord'
 import { oneLine } from 'common-tags'
 import { getFlatGuildRelayHistory, addBlacklisted, getSettings } from '../db/functions'
-import { CommandInteraction, ContextMenuInteraction } from 'discord.js'
+import { CommandInteraction, ContextMenuCommandInteraction } from 'discord.js'
 import { isBlacklisted } from '../../modules/livechat/commentBooleans'
 import { RelayedComment } from '../db/models/RelayedComment'
 import { ContextMenuCommandBuilder } from '@discordjs/builders'
-import { warn } from '../../helpers'
 
 export const blacklist: Command = {
   config: {
@@ -16,11 +15,9 @@ export const blacklist: Command = {
     description: oneLine`Blacklists author`,
   },
   slash: new ContextMenuCommandBuilder().setName('blacklist').setType(3), // message
-  callback: async (intr: CommandInteraction): Promise<void> => {
-    if (!intr.isMessageContextMenu()) {
-      warn('Something very weird happened.')
-      return
-    }
+  callback: async (intr_: CommandInteraction): Promise<void> => {
+    // shitty hack because i suck
+    const intr = intr_ as ContextMenuCommandInteraction
     const reason = 'Requested by context menu interaction'
     blacklistTl(intr, reason)
   },
@@ -28,7 +25,7 @@ export const blacklist: Command = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-async function blacklistTl(intr: ContextMenuInteraction, reason: string): Promise<void> {
+async function blacklistTl(intr: ContextMenuCommandInteraction, reason: string): Promise<void> {
   const settings = getSettings(intr.guild!)
   const refId = intr.targetId
   const history = await getFlatGuildRelayHistory(intr.guild!)
@@ -43,12 +40,12 @@ async function blacklistTl(intr: ContextMenuInteraction, reason: string): Promis
   callback(intr, culprit!, reason)
 }
 
-function notifyDuplicate(intr: ContextMenuInteraction): void {
+function notifyDuplicate(intr: ContextMenuCommandInteraction): void {
   reply(intr, createEmbedMessage(':warning: Already blacklisted'))
 }
 
 function addBlacklistedAndConfirm(
-  intr: ContextMenuInteraction,
+  intr: ContextMenuCommandInteraction,
   { ytId, author }: RelayedComment,
   reason: string,
 ): void {
@@ -77,6 +74,6 @@ function addBlacklistedAndConfirm(
   )
 }
 
-function notifyTranslatorNotFound(intr: ContextMenuInteraction): void {
+function notifyTranslatorNotFound(intr: ContextMenuCommandInteraction): void {
   reply(intr, createEmbedMessage(':warning: Translator data not found.'))
 }

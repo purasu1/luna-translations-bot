@@ -1,6 +1,6 @@
 import { Command, emoji } from '../../helpers/discord'
 import { oneLine } from 'common-tags'
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import { validateInputAndModifyEntryList } from '../db/functions'
 import { notificationCommand } from '../../helpers/discord/slash'
 
@@ -16,7 +16,7 @@ export const cameos: Command = {
     `,
   },
   slash: notificationCommand({ name: 'cameos', subject: 'cameos' }),
-  callback: (intr: CommandInteraction): void => {
+  callback: (intr: ChatInputCommandInteraction): void => {
     const streamer = intr.options.getString('channel')!
     validateInputAndModifyEntryList({
       intr,

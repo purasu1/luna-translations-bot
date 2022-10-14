@@ -1,6 +1,6 @@
 import { Command, emoji } from '../../helpers/discord'
 import { oneLine } from 'common-tags'
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import { validateInputAndModifyEntryList } from '../db/functions'
 import { notificationCommand } from '../../helpers/discord/slash'
 
@@ -13,7 +13,7 @@ export const youtube: Command = {
     description: `Starts or stops sending youtube livestream notifs in the current channel.`,
   },
   slash: notificationCommand({ name: 'youtube', subject: 'YouTube lives' }),
-  callback: async (intr: CommandInteraction): Promise<void> => {
+  callback: async (intr: ChatInputCommandInteraction): Promise<void> => {
     const streamer = intr.options.getString('channel')!
     validateInputAndModifyEntryList({
       intr,

@@ -5,7 +5,7 @@
 import { createEmbed, createEmbedMessage, emoji, reply } from '../../../helpers/discord'
 import { match } from '../../../helpers/language'
 import { getSettings, updateSettings } from './'
-import { CommandInteraction, EmbedFieldData, Snowflake } from 'discord.js'
+import { CommandInteraction, /* EmbedFieldData, */ Snowflake } from 'discord.js'
 import { findStreamerName, replyStreamerList, StreamerName, streamers } from '../../db/streamers/'
 import { WatchFeatureSettings, WatchFeature, GuildSettings } from '../../db/models'
 import { getAllSettings } from './guildSettings'
@@ -191,7 +191,7 @@ async function clearEntries({ feature, intr }: ValidatedOptions): Promise<void> 
   reply(intr, createEmbedMessage(`Cleared all entries for ${feature}.`))
 }
 
-function getEntryFields(entries: WatchFeatureSettings[]): EmbedFieldData[] {
+function getEntryFields(entries: WatchFeatureSettings[]) {
   return getEntryList(entries).map((list) => ({
     name: 'Currently relayed',
     value: list || 'No one',

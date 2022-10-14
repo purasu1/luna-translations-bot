@@ -3,10 +3,11 @@ import { client } from '../'
 import { log } from '../../helpers'
 import { clearOldData, clearOldBotData } from '../db/functions'
 import { isMainThread } from 'worker_threads'
+import { ActivityType } from 'discord.js'
 
 export async function ready() {
   log(`${client.user!.tag} serving ${client.guilds.cache.size} servers.`)
-  client.user!.setActivity(`DAILY MAINTENANCES (DEBUGGING)`, { type: 'PLAYING' })
+  client.user!.setActivity(`DAILY MAINTENANCES (DEBUGGING)`, { type: ActivityType.Playing })
   if (isMainThread) {
     console.log('community notifier...')
     import('../../modules/community/communityNotifier')

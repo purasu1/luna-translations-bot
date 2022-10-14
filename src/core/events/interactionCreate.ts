@@ -2,8 +2,8 @@ import {
   Interaction,
   ButtonInteraction,
   Snowflake,
-  CommandInteraction,
   GuildMember,
+  ChatInputCommandInteraction,
 } from 'discord.js'
 import { doNothing, match, isNotNil, log } from '../../helpers'
 import { Command, createEmbedMessage, findTextChannel } from '../../helpers/discord'
@@ -29,10 +29,10 @@ export async function interactionCreate(intr: Interaction): Promise<void> {
   //if (intr.isButton()) tryOrLog(() => processButton(intr as any))
   if (intr.isButton()) return
   await (intr as any).deferReply?.()
-  if (intr.isCommand() || intr.isContextMenu()) {
-    if (await isAuthorTooLowLevel(intr.commandName, intr.member as GuildMember)) {
+  if (intr.isCommand() || (intr as any).isContextMenu()) {
+    if (await isAuthorTooLowLevel((intr as any).commandName, intr.member as GuildMember)) {
       reply(
-        intr,
+        intr as any,
         createEmbed({
           title: 'Insufficient permissions',
           description:
@@ -41,14 +41,14 @@ export async function interactionCreate(intr: Interaction): Promise<void> {
       )
     } else {
       // Not sure if this is safe
-      runRequestedCommand(intr as CommandInteraction)
+      runRequestedCommand(intr as ChatInputCommandInteraction)
     }
   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-function runRequestedCommand(intr: CommandInteraction): void {
+function runRequestedCommand(intr: ChatInputCommandInteraction): void {
   const command = findCommand(intr.commandName)
 
   log(oneLine`
