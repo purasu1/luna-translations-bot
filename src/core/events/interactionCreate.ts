@@ -25,9 +25,10 @@ const commandNames = new Set(commands.keys())
 
 export async function interactionCreate(intr: Interaction): Promise<void> {
   if ((intr as any).commandName && !commandNames.has((intr as any).commandName)) return
-  await (intr as any).deferReply?.()
   if (!intr.inGuild()) return
-  if (intr.isButton()) tryOrLog(() => processButton(intr as any))
+  //if (intr.isButton()) tryOrLog(() => processButton(intr as any))
+  if (intr.isButton()) return
+  await (intr as any).deferReply?.()
   if (intr.isCommand() || intr.isContextMenu()) {
     if (await isAuthorTooLowLevel(intr.commandName, intr.member as GuildMember)) {
       reply(
