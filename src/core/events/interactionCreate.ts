@@ -74,6 +74,8 @@ function findCommand(cmd?: string): Command | undefined {
 }
 
 async function processButton(btn: ButtonInteraction): Promise<void> {
+  console.log('ignoring a button press')
+  return
   const notice = await getNoticeFromMsgId(btn.guild!, btn.message.id)
   const btnHandler = notice
     ? match(btn.customId, {
