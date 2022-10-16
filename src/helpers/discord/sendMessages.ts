@@ -94,11 +94,11 @@ export async function react(
   }
 }
 
-export function ButtonRow(buttons: MessageButtonOptions[]): MessageActionRow {
-  return new MessageActionRow({
-    components: buttons.map((opts) => new MessageButton(opts)),
-  })
-}
+//export function ButtonRow(buttons: MessageButtonOptions[]): MessageActionRow {
+//  return new MessageActionRow({
+//    components: buttons.map((opts) => new MessageButton(opts)),
+//  })
+//}
 
 //// PRIVATE //////////////////////////////////////////////////////////////////
 
