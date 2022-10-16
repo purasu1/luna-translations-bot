@@ -97,7 +97,7 @@ function addEntry({ g, feature, intr, streamer, role, add }: ValidatedOptions): 
                 },
               ]
             : []),
-          ...getEntryFields(newEntries),
+	  //...getEntryFields(newEntries),
         ],
       },
       false,
@@ -146,7 +146,7 @@ function removeEntry({ feature, intr, streamer, remove, g }: ValidatedOptions): 
             value: `<#${intr.channel!.id}>`,
             inline: true,
           },
-          ...getEntryFields(newEntries),
+	  //...getEntryFields(newEntries),
         ],
       },
       false,
