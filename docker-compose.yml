@@ -5,7 +5,10 @@ services:
     build: .
     environment:
       DISCORD_PROD_TOKEN: ${DISCORD_PROD_TOKEN}
+      HOLODEX_API_KEY: ${HOLODEX_API_KEY}
       DEEPL_KEY: ${DEEPL_KEY}
+      TWITCASTING_CLIENT_ID: ${TWITCASTING_CLIENT_ID}
+      TWITCASTING_CLIENT_SECRET: ${TWITCASTING_CLIENT_SECRET}
       MONGODB_URL: mongodb://db/luna
     depends_on:
       - db
