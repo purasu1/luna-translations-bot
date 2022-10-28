@@ -688,7 +688,6 @@ export const hololive = [
     twitter: 'sakamatachloe',
     aliases: ['Chloe'],
   },
-
   {
     name: 'Kazama Iroha',
     ytId: 'UC_vMYWcDjmfdpH6r4TTn1MQ',
@@ -697,5 +696,33 @@ export const hololive = [
     groups: ['6th Generation'],
     twitter: 'kazamairohach',
     aliases: ['Iroha'],
+  },
+  // id3
+  {
+    name: 'Vestia Zeta',
+    ytId: 'UCTvHWSfBZgtxE4sILOaurIQ',
+    chName: 'Vestia Zeta Ch. hololive-ID',
+    picture: 'dont put anything here',
+    groups: ['Indonesia 3rd Gen'],
+    twitter: 'vestiazeta',
+    aliases: ['Zeta'],
+  },
+  {
+    name: 'Kobo Kanaeru',
+    ytId: 'UCjLEmnpCNeisMxy134KPwWw',
+    chName: 'Kobo Kanaeru Ch. hololive-ID',
+    picture: 'dont put anything here',
+    groups: ['Indonesia 3rd Gen'],
+    twitter: 'kobokanaeru',
+    aliases: ['kobo'],
+  },
+  {
+    name: 'Kaela Kovalskia',
+    ytId: 'UCZLZ8Jjx_RN2CXloOmgTHVg',
+    chName: 'Kaela Kovalskia Ch. hololive-ID',
+    picture: 'dont put anything here',
+    groups: ['Indonesia 3rd Gen'],
+    twitter: 'kaelakovalskia',
+    aliases: ['kaela'],
   },
 ] as const

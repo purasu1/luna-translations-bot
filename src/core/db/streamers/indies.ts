@@ -114,6 +114,15 @@ export const indies = [
     twitter: 'yu_ka_misumi',
     aliases: [],
   },
+  {
+    name: 'rurudo',
+    ytId: 'https://www.youtube.com/channel/UCim0N3tvLijU_I3jbJeJV8g',
+    chName: 'るるどらいおん',
+    picture: '',
+    groups: ['indies'],
+    twitter: 'rurudo_',
+    aliases: [],
+  },
   // {
   // name: 'tam', ytId: 'UCVTRz4yxAm0m3jo_4tpEcZw',
   // chName: 'タム',
