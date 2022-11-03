@@ -3,6 +3,8 @@
 Luna's Translations is a private Discord bot for the Hololive fandom written in TypeScript.
 It is being used on over 200 servers with an average of over 10,000 users each.
 
+The code is messy, don't look. :)
+
 ## Features
 
 - Relaying YouTube livestream chat translations in real time from YouTube livechat to Discord
