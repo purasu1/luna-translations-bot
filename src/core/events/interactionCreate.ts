@@ -5,7 +5,7 @@ import {
   GuildMember,
   ChatInputCommandInteraction,
 } from 'discord.js'
-import { doNothing, match, isNotNil, log } from '../../helpers'
+import { doNothing, match, isNotNil, log, debug } from '../../helpers'
 import { Command, createEmbedMessage, findTextChannel } from '../../helpers/discord'
 import {
   getNoticeFromMsgId,
@@ -75,7 +75,7 @@ function findCommand(cmd?: string): Command | undefined {
 }
 
 async function processButton(btn: ButtonInteraction): Promise<void> {
-  console.log('ignoring a button press')
+  debug('ignoring a button press')
   return
   const notice = await getNoticeFromMsgId(btn.guild!, btn.message.id)
   const btnHandler = notice

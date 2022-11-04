@@ -30,11 +30,11 @@ function logger<T>(category: string, data: T): T {
   })
 
   const timeYYYYMMDD = new Date().toISOString().substr(0, 10)
-  const timeHHMM = new Date().toISOString().substr(11, 5)
+  const timeHHMMSS = new Date().toISOString().substr(11, 8)
   const label = colorString(` ${category.toUpperCase()} `)
 
-  console.log(`${timeHHMM} ${label} ${data}`)
-  logFile.write(`${category} | ${timeYYYYMMDD} ${timeHHMM} | ${data}\n`)
+  console.log(`${timeHHMMSS} ${label} ${data}`)
+  logFile.write(`${category} | ${timeYYYYMMDD} ${timeHHMMSS} | ${data}\n`)
   logFile.close()
 
   return data

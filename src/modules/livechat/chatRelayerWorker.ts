@@ -1,4 +1,4 @@
-import { ciEquals, doNothing, isJp, match } from '../../helpers'
+import { ciEquals, debug, doNothing, isJp, match } from '../../helpers'
 import { DexFrame } from '../holodex/frames'
 import { Streamer, StreamerName, streamers, streamersMap } from '../../core/db/streamers'
 import { emoji } from '../../helpers/discord'
@@ -115,7 +115,7 @@ export async function processComments(
   cmts: ChatComment[],
   entrs?: Entries,
 ): Promise<Task[]> {
-  console.log('computing tasks...')
+  debug('computing tasks...')
   const tasks = await Promise.all(
     cmts.flatMap(async (cmt) => {
       const isTl_ = cmt.isTl || isTl(cmt.body)
@@ -178,7 +178,7 @@ export async function processComments(
       return [...sendTasks, ...(mustSave_ ? [saveTask] : [])]
     }),
   )
-  console.log('done computing tasks')
+  debug('done computing tasks')
 
   return tasks.flat()
 }

@@ -4,7 +4,7 @@ import {
   getAllSettings,
   getNotifiedCommunityPosts,
 } from '../../core/db/functions'
-import { removeDupes, sleep } from '../../helpers'
+import { debug, removeDupes, sleep } from '../../helpers'
 import { getLatestPost } from './getLatestPost'
 import { streamers } from '../../core/db/streamers/'
 import { asyncTryOrLog } from '../../helpers/tryCatch'
@@ -20,7 +20,7 @@ function CommunityEmitter(): EventEmitter {
 }
 
 async function continuouslyEmitNewPosts(emitter: EventEmitter): Promise<void> {
-  console.log('checking for new community posts')
+  debug('checking for new community posts')
   const allSettings = getAllSettings()
   const subs = removeDupes(
     allSettings
