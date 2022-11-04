@@ -10,9 +10,6 @@ import { client } from '../../lunaBotClient'
 import { RelayedComment } from '../models/RelayedComment'
 import { GuildData, BlacklistNotice, GuildDataDb } from '../models/GuildData'
 import { YouTubeChannelId } from '../../../modules/holodex/frames'
-import Enmap from 'enmap'
-
-export const guildDataEnmap: Enmap<Snowflake, GuildData> = new Enmap({ name: 'guildData' })
 
 export type ImmutableRelayHistory = ImmutableMap<VideoId, RelayedComment[]>
 
@@ -156,7 +153,7 @@ export async function clearOldData(): Promise<void> {
 }
 
 export function deleteGuildData(g: Snowflake): void {
-  if (guildDataEnmap.has(g)) guildDataEnmap.delete(g)
+  // temporarily deleted to not use enmap
 }
 
 ///////////////////////////////////////////////////////////////////////////////

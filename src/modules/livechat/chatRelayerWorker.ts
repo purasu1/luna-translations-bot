@@ -115,6 +115,7 @@ export async function processComments(
   cmts: ChatComment[],
   entrs?: Entries,
 ): Promise<Task[]> {
+  console.log('computing tasks...')
   const tasks = await Promise.all(
     cmts.flatMap(async (cmt) => {
       const isTl_ = cmt.isTl || isTl(cmt.body)
@@ -177,6 +178,7 @@ export async function processComments(
       return [...sendTasks, ...(mustSave_ ? [saveTask] : [])]
     }),
   )
+  console.log('done computing tasks')
 
   return tasks.flat()
 }

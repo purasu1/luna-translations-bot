@@ -28,7 +28,10 @@ export function getSettings(
 }
 
 export function getAllSettings(): GuildSettings[] {
-  return client.guilds.cache.map(getGuildSettings)
+  console.log('getting all settings')
+  const result = client.guilds.cache.map(getGuildSettings)
+  console.log('done getting all settinlgs')
+  return result
 }
 
 export function addBlacklisted(g: Guild | Snowflake, item: BlacklistItem): void {

@@ -184,7 +184,7 @@ async function runTask(task: Task): Promise<void> {
     const ch = findTextChannel(task.cid)
     const thread = task.tlRelay ? await findFrameThread(task.vId, task.g) : null
 
-    log(`[MESSAGE NOT SENT (DEBUG MODE)] ${task.vId} | ${task.content}`);
+    log(`${task.vId} | ${task.content}`);
     // const lastMsg = ch?.lastMessage
     // const isBotLastPoster = lastMsg?.author?.id === client.user?.id
     // // // this code is ugly and duplicated but im in a hurry
