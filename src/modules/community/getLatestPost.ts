@@ -22,8 +22,12 @@ export interface CommunityPost {
 ///////////////////////////////////////////////////////////////////////////////
 
 function extractYtData(ytData: any, ytId: string): CommunityPost | undefined {
+  const content = ytData.contents?.twoColumnBrowseResultsRenderer.tabs[3].tabRenderer.content
+  if (content === undefined) {
+    return undefined
+  }
   const latestPost =
-    ytData.contents?.twoColumnBrowseResultsRenderer.tabs[3].tabRenderer.content.sectionListRenderer
+    content.sectionListRenderer
       .contents[0].itemSectionRenderer.contents[0].backstagePostThreadRenderer?.post
       .backstagePostRenderer
   const textEls = latestPost?.contentText.runs as any[]
