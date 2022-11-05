@@ -7,25 +7,29 @@ import { emoji } from '../helpers/discord'
 import { tryOrLog } from '../helpers/tryCatch'
 import { notifyDiscord } from './notify'
 import { isMainThread } from 'worker_threads'
+import { debug } from '../helpers'
 const { twitcastingId, twitcastingSecret } = config
 
 if (isMainThread) initTwitcast()
 
 function initTwitcast(): void {
-  console.log('initiating twitcast')
+  debug('initiating twitcast')
   const socket = new WebSocket(
     `wss://${twitcastingId}:${twitcastingSecret}@realtime.twitcasting.tv/lives`,
   )
   socket.on('error', (...args) => {
-    console.log('TWITCAST SOCKET CLOSED: ', JSON.stringify(args))
+    debug('TWITCAST SOCKET CLOSED: ')
+    debug(JSON.stringify(args))
     socket.close()
   })
   socket.onerror = (...args) => {
-    console.log('[2]TWITCAST SOCKET CLOSED: ', JSON.stringify(args))
+    debug('[2]TWITCAST SOCKET CLOSED: ')
+    debug(JSON.stringify(args))
     socket.close()
   }
   socket.on('close', (...args) => {
-    console.log('twitcast closed: ', JSON.stringify(args))
+    debug('twitcast closed: ')
+    debug(JSON.stringify(args))
     initTwitcast()
   })
   socket.on('message', processMessage)
@@ -35,9 +39,9 @@ async function processMessage(data: any): Promise<void> {
   const json = tryOrLog(() => JSON.parse(data as string))
   const lives = json?.movies?.map(processPayloadEntry) as any[]
   const settings = getAllSettings()
-  console.log('notifying twitcasts')
+  debug('notifying twitcasts')
   lives?.forEach((live) => notifyLive(live, settings))
-  console.log('done notifying twitcasts')
+  debug('done notifying twitcasts')
 }
 
 function processPayloadEntry(message: any): TwitcastingLive {

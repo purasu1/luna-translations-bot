@@ -16,17 +16,18 @@ const musicCmds = [{"name":"clear","description":"Clear all tracks from queue","
 
 ;(async () => {
   try {
-    console.log('Started refreshing application (/) commands.')
+    const { log } = console
+    log('Started refreshing application (/) commands.')
     const body = [...musicCmds, ...commands.map((v, k) => {
-      console.log(`jsonning ${k}`)
+      log(`jsonning ${k}`)
       return v.slash.toJSON()
     }).toList().toArray()]
 
-    console.log(body)
-    console.log('====================')
+    log(body)
+    log('====================')
     await rest.put(Routes.applicationCommands(clientId), { body })
 
-    console.log('Successfully reloaded application (/) commands.')
+    log('Successfully reloaded application (/) commands.')
   } catch (error) {
     console.error(error)
   }
