@@ -22,7 +22,9 @@ export interface CommunityPost {
 ///////////////////////////////////////////////////////////////////////////////
 
 function extractYtData(ytData: any, ytId: string): CommunityPost | undefined {
-  const content = ytData.contents?.twoColumnBrowseResultsRenderer.tabs[3].tabRenderer.content
+  const tabs = ytData.contents?.twoColumnBrowseResultsRenderer.tabs
+  const communityTab = tabs.find(t => t.tabRenderer?.title === 'Community')
+  const content = communityTab?.tabRenderer?.content
   if (content === undefined) {
     return undefined
   }
