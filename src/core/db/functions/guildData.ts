@@ -11,6 +11,7 @@ import { RelayedComment } from '../models/RelayedComment'
 import { GuildData, BlacklistNotice, GuildDataDb } from '../models/GuildData'
 import { YouTubeChannelId } from '../../../modules/holodex/frames'
 import { debug } from '../../../helpers'
+import { takeRight } from 'fp-ts/lib/Array'
 
 export type ImmutableRelayHistory = ImmutableMap<VideoId, RelayedComment[]>
 
@@ -70,12 +71,19 @@ export async function addToGuildRelayHistory (
   const history    = (await getGuildData (g)).relayHistory
   debug('got guild data.')
   const cmts = history.get(videoId) ?? []
-  const newHistory = setKey(videoId, take(500, [...cmts, cmt]))(history)
+  const newHistory = setKey(videoId, takeRight(500)([...cmts, cmt]))(history)
   debug('updating guild data...')
 
-  await updateGuildData(g, { relayHistory: newHistory })
+  await updateGuildData(g, {
+    relayHistory: newHistory,
+  })
     .catch((e) => {
       debug("UPDATE GUILD DATA FAILED WITH ERROR: " + JSON.stringify(e))
+      updateGuildData(g, {
+        relayHistory: new Map(),
+        relayNotices: new Map(),
+        blacklistNotices: new Map(),
+      })
     })
   debug('updated guild data.')
   debug('...done adding to guild relay history')
