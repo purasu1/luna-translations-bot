@@ -1,6 +1,7 @@
 import { DocumentType } from '@typegoose/typegoose'
 import Enmap from 'enmap'
 import { UpdateQuery } from 'mongoose'
+import { take } from 'ramda'
 import { debug } from '../../../helpers'
 import { setKey, filter } from '../../../helpers/immutableES6MapFunctions'
 import { VideoId } from '../../../modules/holodex/frames'
@@ -44,7 +45,7 @@ export async function addToBotRelayHistory(videoId: VideoId, cmt: RelayedComment
   debug('adding to bot relay history...')
   const history = (await getBotData()).relayHistory
   const cmts = history.get(videoId) ?? []
-  const newHistory = setKey(videoId, [...cmts, cmt])(history)
+  const newHistory = setKey(videoId, take(500, [...cmts, cmt]))(history)
   updateBotData({ relayHistory: newHistory })
   debug('done adding to bot relay history')
 }

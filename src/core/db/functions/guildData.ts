@@ -2,7 +2,7 @@ import { DocumentType } from '@typegoose/typegoose'
 import { Guild, Snowflake } from 'discord.js'
 import { Map as ImmutableMap } from 'immutable'
 import { UpdateQuery } from 'mongoose'
-import { head, zip } from 'ramda'
+import { head, take, zip } from 'ramda'
 import { snowflakeToUnix, isGuild } from '../../../helpers/discord'
 import { deleteKey, filter, setKey } from '../../../helpers/immutableES6MapFunctions'
 import { VideoId } from '../../../modules/holodex/frames'
@@ -70,7 +70,7 @@ export async function addToGuildRelayHistory (
   const history    = (await getGuildData (g)).relayHistory
   debug('got guild data.')
   const cmts = history.get(videoId) ?? []
-  const newHistory = setKey(videoId, [...cmts, cmt])(history)
+  const newHistory = setKey(videoId, take(500, [...cmts, cmt]))(history)
   debug('updating guild data...')
   updateGuildData(g, { relayHistory: newHistory })
   debug('updated guild data.')
