@@ -72,7 +72,7 @@ export async function addToGuildRelayHistory (
   const cmts = history.get(videoId) ?? []
   const newHistory = setKey(videoId, take(500, [...cmts, cmt]))(history)
   debug('updating guild data...')
-  updateGuildData(g, { relayHistory: newHistory })
+  await updateGuildData(g, { relayHistory: newHistory })
   debug('updated guild data.')
   debug('...done adding to guild relay history')
 }

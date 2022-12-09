@@ -46,7 +46,7 @@ export async function addToBotRelayHistory(videoId: VideoId, cmt: RelayedComment
   const history = (await getBotData()).relayHistory
   const cmts = history.get(videoId) ?? []
   const newHistory = setKey(videoId, take(500, [...cmts, cmt]))(history)
-  updateBotData({ relayHistory: newHistory })
+  await updateBotData({ relayHistory: newHistory })
   debug('done adding to bot relay history')
 }
 
