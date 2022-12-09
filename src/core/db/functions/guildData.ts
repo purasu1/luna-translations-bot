@@ -72,7 +72,11 @@ export async function addToGuildRelayHistory (
   const cmts = history.get(videoId) ?? []
   const newHistory = setKey(videoId, take(500, [...cmts, cmt]))(history)
   debug('updating guild data...')
+
   await updateGuildData(g, { relayHistory: newHistory })
+    .catch((e) => {
+      debug("UPDATE GUILD DATA FAILED WITH ERROR: " + JSON.stringify(e))
+    })
   debug('updated guild data.')
   debug('...done adding to guild relay history')
 }
