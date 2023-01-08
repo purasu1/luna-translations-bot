@@ -417,7 +417,7 @@ export const hololive = [
       'https://yt3.ggpht.com/ytc/AAUvwniS_ftaXhqYt1SQPjyuFx5MD_-v0fIUkbCTq5Q_gg=s800-c-k-c0x00ffffff-no-rj',
     groups: ['Indonesia 1st Gen'],
     twitter: 'ayunda_risu',
-    aliases: ['risu', 'ayunda', 'アユンダ', 'リス'],
+    aliases: ['risu', 'ayunda', 'アユンダ'],
   },
   {
     name: 'Moona Hoshinova',
