@@ -8,7 +8,7 @@ export const emoji: Record<Name, EmojiCode> = {
   tc: '<:twitcasting:1012510025601777685>',
   yt: '<:youtube:1012509333252210768>',
   peek: '<:mikopeek:1012510032476246156>',
-  niji: '<:nijisanji:1038559383518462104>',
+  niji: '<:nijisanji2:1062887905271488533>',
 } as const
 
 ///////////////////////////////////////////////////////////////////////////////
