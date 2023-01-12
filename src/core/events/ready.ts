@@ -19,7 +19,7 @@ export async function ready() {
     import('../../modules/livechat/chatRelayer')
 
     // setInterval(clearOldData, 24 * 60 * 60 * 100)
-    // clearOldData()
-    // clearOldBotData()
+    clearOldData()
+    clearOldBotData()
   }
 }
